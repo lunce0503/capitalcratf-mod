@@ -69,7 +69,7 @@ public final class FinanceScreen extends Screen {
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(graphics, mouseX, mouseY, partialTick);
+        graphics.fill(0, 0, this.width, this.height, 0x90000000);
         int panelWidth = 300;
         int left = (this.width - panelWidth) / 2;
         int top = Math.max(20, (this.height - 220) / 2);
