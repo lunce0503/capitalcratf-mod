@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "capitalcraft-mod",
+  "version": "${version}",
+  "name": "CapitalCraft Mod",
+  "description": "Required CapitalCraft Fabric client for finance UI communication with the Paper server.",
+  "authors": [
+    "kwon"
+  ],
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "kr.kwon.capitalcraft.client.CapitalCraftClientMod"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.2",
+    "fabric-api": ">=0.141.4+1.21.11",
+    "minecraft": "1.21.11",
+    "java": ">=21"
+  }
+}
