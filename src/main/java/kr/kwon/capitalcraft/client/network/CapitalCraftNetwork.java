@@ -1,6 +1,7 @@
 package kr.kwon.capitalcraft.client.network;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.util.UUID;
@@ -59,14 +60,22 @@ public final class CapitalCraftNetwork {
     }
 
     public static void handle(String rawJson) {
-        JsonObject root;
         try {
-            root = JsonParser.parseString(rawJson).getAsJsonObject();
+            handlePayload(rawJson);
         } catch (RuntimeException exception) {
+            CapitalCraftClientMod.LOGGER.error("Failed to handle CapitalCraft finance payload: {}", rawJson, exception);
+            updateScreenStatus("서버 응답 처리 중 오류가 발생했습니다.");
+        }
+    }
+
+    private static void handlePayload(String rawJson) {
+        JsonElement parsed = JsonParser.parseString(rawJson);
+        if (!parsed.isJsonObject()) {
             updateScreenStatus("서버 응답을 해석하지 못했습니다.");
             return;
         }
 
+        JsonObject root = parsed.getAsJsonObject();
         String type = string(root, "type", "");
         JsonObject payload = root.has("payload") && root.get("payload").isJsonObject()
             ? root.getAsJsonObject("payload")
@@ -74,7 +83,7 @@ public final class CapitalCraftNetwork {
 
         switch (type) {
             case "S2C_HELLO_ACK" -> {
-                handshakeAccepted = payload.has("accepted") && payload.get("accepted").getAsBoolean();
+                handshakeAccepted = bool(payload, "accepted", false);
                 updateScreenStatus(handshakeAccepted ? "서버 연결 완료" : "서버 연결 거부");
             }
             case "S2C_BALANCE_RESPONSE" -> {
@@ -88,7 +97,7 @@ public final class CapitalCraftNetwork {
                 }
             }
             case "S2C_TRANSFER_RESULT" -> {
-                boolean success = payload.has("success") && payload.get("success").getAsBoolean();
+                boolean success = bool(payload, "success", false);
                 if (success) {
                     String balance = string(payload, "fromBalance", "0");
                     if (openFinanceScreen != null) {
@@ -103,8 +112,8 @@ public final class CapitalCraftNetwork {
                     openFinanceScreen.updateBalance(
                         string(payload, "balance", "0"),
                         string(payload, "currency", "VIL"),
-                        "기본 계좌",
-                        "ACTIVE"
+                        string(payload, "accountName", "기본 계좌"),
+                        string(payload, "accountStatus", "ACTIVE")
                     );
                     openFinanceScreen.setStatus("잔액이 갱신되었습니다.");
                 }
@@ -136,6 +145,7 @@ public final class CapitalCraftNetwork {
             ClientPlayNetworking.send(new FinancePayload(GSON.toJson(root)));
             return true;
         } catch (RuntimeException exception) {
+            CapitalCraftClientMod.LOGGER.warn("Failed to send CapitalCraft finance packet: {}", type, exception);
             return false;
         }
     }
@@ -150,6 +160,21 @@ public final class CapitalCraftNetwork {
         if (!object.has(key) || object.get(key).isJsonNull()) {
             return fallback;
         }
-        return object.get(key).getAsString();
+        try {
+            return object.get(key).getAsString();
+        } catch (RuntimeException exception) {
+            return fallback;
+        }
+    }
+
+    private static boolean bool(JsonObject object, String key, boolean fallback) {
+        if (!object.has(key) || object.get(key).isJsonNull()) {
+            return fallback;
+        }
+        try {
+            return object.get(key).getAsBoolean();
+        } catch (RuntimeException exception) {
+            return fallback;
+        }
     }
 }

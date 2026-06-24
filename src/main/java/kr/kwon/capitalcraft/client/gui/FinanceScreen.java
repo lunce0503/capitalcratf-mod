@@ -1,7 +1,6 @@
 package kr.kwon.capitalcraft.client.gui;
 
 import kr.kwon.capitalcraft.client.network.CapitalCraftNetwork;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -60,6 +59,7 @@ public final class FinanceScreen extends Screen {
     @Override
     public void removed() {
         CapitalCraftNetwork.clearOpenFinanceScreen(this);
+        super.removed();
     }
 
     @Override

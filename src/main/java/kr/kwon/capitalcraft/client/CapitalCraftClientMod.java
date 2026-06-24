@@ -11,12 +11,16 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class CapitalCraftClientMod implements ClientModInitializer {
     public static final String MOD_ID = "capitalcraft-mod";
-    public static final String MOD_VERSION = "0.1.0";
+    public static final String MOD_VERSION = "0.1.1";
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static final KeyMapping.Category KEY_CATEGORY =
         KeyMapping.Category.register(Identifier.fromNamespaceAndPath("capitalcraft", "finance"));
     private static KeyMapping financeKey;
@@ -43,11 +47,26 @@ public final class CapitalCraftClientMod implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (financeKey.consumeClick()) {
-                Minecraft minecraft = Minecraft.getInstance();
-                if (minecraft.player != null) {
-                    minecraft.setScreen(new FinanceScreen());
-                }
+                openFinanceScreen(client);
             }
         });
+    }
+
+    private static void openFinanceScreen(Minecraft client) {
+        if (client.player == null || client.level == null) {
+            return;
+        }
+        if (client.screen instanceof FinanceScreen) {
+            return;
+        }
+        try {
+            client.setScreen(new FinanceScreen());
+        } catch (RuntimeException exception) {
+            LOGGER.error("Failed to open CapitalCraft finance screen", exception);
+            client.player.displayClientMessage(
+                Component.literal("CapitalCraft 금융 화면을 열 수 없습니다. 로그를 확인해 주세요."),
+                false
+            );
+        }
     }
 }
