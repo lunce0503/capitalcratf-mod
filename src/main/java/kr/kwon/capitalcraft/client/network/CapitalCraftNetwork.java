@@ -39,7 +39,7 @@ public final class CapitalCraftNetwork {
         payload.addProperty("modId", CapitalCraftClientMod.MOD_ID);
         payload.addProperty("modVersion", CapitalCraftClientMod.MOD_VERSION);
         payload.addProperty("minecraftVersion", "1.21.11");
-        payload.add("features", GSON.toJsonTree(new String[] {"finance_ui"}));
+        payload.add("features", GSON.toJsonTree(new String[] {"finance_ui", "trade_commands"}));
         send("C2S_HELLO", "hello-" + UUID.randomUUID(), payload);
     }
 
