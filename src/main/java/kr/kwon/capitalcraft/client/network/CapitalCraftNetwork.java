@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import java.util.UUID;
 import kr.kwon.capitalcraft.client.CapitalCraftClientMod;
 import kr.kwon.capitalcraft.client.gui.FinanceScreen;
+import kr.kwon.capitalcraft.client.gui.TradeScreen;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 
@@ -14,6 +15,7 @@ public final class CapitalCraftNetwork {
     private static final Gson GSON = new Gson();
     private static final int PROTOCOL = 1;
     private static FinanceScreen openFinanceScreen;
+    private static TradeScreen openTradeScreen;
     private static boolean handshakeAccepted;
 
     private CapitalCraftNetwork() {
@@ -22,6 +24,7 @@ public final class CapitalCraftNetwork {
     public static void reset() {
         handshakeAccepted = false;
         openFinanceScreen = null;
+        openTradeScreen = null;
     }
 
     public static void setOpenFinanceScreen(FinanceScreen screen) {
@@ -34,12 +37,22 @@ public final class CapitalCraftNetwork {
         }
     }
 
+    public static void setOpenTradeScreen(TradeScreen screen) {
+        openTradeScreen = screen;
+    }
+
+    public static void clearOpenTradeScreen(TradeScreen screen) {
+        if (openTradeScreen == screen) {
+            openTradeScreen = null;
+        }
+    }
+
     public static void sendHello() {
         JsonObject payload = new JsonObject();
         payload.addProperty("modId", CapitalCraftClientMod.MOD_ID);
         payload.addProperty("modVersion", CapitalCraftClientMod.MOD_VERSION);
         payload.addProperty("minecraftVersion", "1.21.11");
-        payload.add("features", GSON.toJsonTree(new String[] {"finance_ui", "trade_commands"}));
+        payload.add("features", GSON.toJsonTree(new String[] {"finance_ui", "trade_commands", "trade_gui"}));
         send("C2S_HELLO", "hello-" + UUID.randomUUID(), payload);
     }
 
@@ -56,6 +69,41 @@ public final class CapitalCraftNetwork {
         payload.addProperty("memo", memo);
         if (!send("C2S_TRANSFER_REQUEST", "transfer-" + UUID.randomUUID(), payload)) {
             updateScreenStatus("서버 금융 채널이 아직 준비되지 않았습니다.");
+        }
+    }
+
+    public static void requestTradePay(String amount) {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("amount", amount);
+        if (!send("C2S_TRADE_PAY_OFFER", "trade-pay-" + UUID.randomUUID(), payload)) {
+            updateTradeStatus("서버 거래 채널이 아직 준비되지 않았습니다.");
+        }
+    }
+
+    public static void requestTradeSell(String price, String itemAmount) {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("price", price);
+        payload.addProperty("itemAmount", itemAmount);
+        if (!send("C2S_TRADE_SELL_OFFER", "trade-sell-" + UUID.randomUUID(), payload)) {
+            updateTradeStatus("서버 거래 채널이 아직 준비되지 않았습니다.");
+        }
+    }
+
+    public static void acceptTrade() {
+        if (!send("C2S_TRADE_ACCEPT", "trade-accept-" + UUID.randomUUID(), new JsonObject())) {
+            updateTradeStatus("서버 거래 채널이 아직 준비되지 않았습니다.");
+        }
+    }
+
+    public static void denyTrade() {
+        if (!send("C2S_TRADE_DENY", "trade-deny-" + UUID.randomUUID(), new JsonObject())) {
+            updateTradeStatus("서버 거래 채널이 아직 준비되지 않았습니다.");
+        }
+    }
+
+    public static void cancelTrade() {
+        if (!send("C2S_TRADE_CANCEL", "trade-cancel-" + UUID.randomUUID(), new JsonObject())) {
+            updateTradeStatus("서버 거래 채널이 아직 준비되지 않았습니다.");
         }
     }
 
@@ -107,6 +155,10 @@ public final class CapitalCraftNetwork {
                     updateScreenStatus(string(payload, "message", "송금 실패"));
                 }
             }
+            case "S2C_TRADE_RESULT" -> {
+                boolean success = bool(payload, "success", false);
+                updateTradeStatus(string(payload, "message", success ? "거래 요청 완료" : "거래 요청 실패"));
+            }
             case "S2C_BALANCE_UPDATED" -> {
                 if (openFinanceScreen != null) {
                     openFinanceScreen.updateBalance(
@@ -118,7 +170,11 @@ public final class CapitalCraftNetwork {
                     openFinanceScreen.setStatus("잔액이 갱신되었습니다.");
                 }
             }
-            case "S2C_ERROR" -> updateScreenStatus(string(payload, "message", "서버 오류"));
+            case "S2C_ERROR" -> {
+                String message = string(payload, "message", "서버 오류");
+                updateScreenStatus(message);
+                updateTradeStatus(message);
+            }
             default -> {
             }
         }
@@ -153,6 +209,12 @@ public final class CapitalCraftNetwork {
     private static void updateScreenStatus(String message) {
         if (openFinanceScreen != null) {
             openFinanceScreen.setStatus(message);
+        }
+    }
+
+    private static void updateTradeStatus(String message) {
+        if (openTradeScreen != null) {
+            openTradeScreen.setStatus(message);
         }
     }
 
