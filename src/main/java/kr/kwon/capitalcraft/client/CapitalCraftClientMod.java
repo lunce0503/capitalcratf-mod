@@ -1,5 +1,6 @@
 package kr.kwon.capitalcraft.client;
 
+import kr.kwon.capitalcraft.client.butchery.ButcheryHud;
 import kr.kwon.capitalcraft.client.gui.FinanceScreen;
 import kr.kwon.capitalcraft.client.gui.TradeScreen;
 import kr.kwon.capitalcraft.client.network.CapitalCraftNetwork;
@@ -20,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public final class CapitalCraftClientMod implements ClientModInitializer {
     public static final String MOD_ID = "capitalcraft-mod";
-    public static final String MOD_VERSION = "0.3.0";
+    public static final String MOD_VERSION = "0.4.0";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static final KeyMapping.Category KEY_CATEGORY =
         KeyMapping.Category.register(Identifier.fromNamespaceAndPath("capitalcraft", "finance"));
@@ -40,6 +41,7 @@ public final class CapitalCraftClientMod implements ClientModInitializer {
             CapitalCraftNetwork.sendHello();
         });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> CapitalCraftNetwork.reset());
+        ButcheryHud.register();
 
         financeKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "key.capitalcraft.finance",

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.util.UUID;
 import kr.kwon.capitalcraft.client.CapitalCraftClientMod;
+import kr.kwon.capitalcraft.client.butchery.ButcheryClientState;
 import kr.kwon.capitalcraft.client.gui.FinanceScreen;
 import kr.kwon.capitalcraft.client.gui.TradeScreen;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -25,6 +26,7 @@ public final class CapitalCraftNetwork {
         handshakeAccepted = false;
         openFinanceScreen = null;
         openTradeScreen = null;
+        ButcheryClientState.reset();
     }
 
     public static void setOpenFinanceScreen(FinanceScreen screen) {
@@ -52,7 +54,13 @@ public final class CapitalCraftNetwork {
         payload.addProperty("modId", CapitalCraftClientMod.MOD_ID);
         payload.addProperty("modVersion", CapitalCraftClientMod.MOD_VERSION);
         payload.addProperty("minecraftVersion", "1.21.11");
-        payload.add("features", GSON.toJsonTree(new String[] {"finance_ui", "trade_commands", "trade_gui"}));
+        payload.add("features", GSON.toJsonTree(new String[] {
+            "finance_ui",
+            "trade_commands",
+            "trade_gui",
+            "butchery_sync",
+            "butchery_hud"
+        }));
         send("C2S_HELLO", "hello-" + UUID.randomUUID(), payload);
     }
 
@@ -170,6 +178,7 @@ public final class CapitalCraftNetwork {
                     openFinanceScreen.setStatus("잔액이 갱신되었습니다.");
                 }
             }
+            case "S2C_BUTCHERY_SYNC" -> ButcheryClientState.sync(payload);
             case "S2C_ERROR" -> {
                 String message = string(payload, "message", "서버 오류");
                 updateScreenStatus(message);
