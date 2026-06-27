@@ -1,7 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "capitalcraft:item/pig_carcass"
+    "layer0": "capitalcraft:item/chicken_carcass"
   },
   "display": {
     "ground": {
