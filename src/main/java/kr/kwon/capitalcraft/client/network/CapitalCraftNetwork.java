@@ -6,9 +6,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.util.UUID;
 import kr.kwon.capitalcraft.client.CapitalCraftClientMod;
-import kr.kwon.capitalcraft.client.butchery.ButcheryClientState;
-import kr.kwon.capitalcraft.client.gui.FinanceScreen;
-import kr.kwon.capitalcraft.client.gui.TradeScreen;
+import kr.kwon.capitalcraft.client.foodindustry.butchery.ButcheryClientState;
+import kr.kwon.capitalcraft.client.economy.gui.FinanceScreen;
+import kr.kwon.capitalcraft.client.economy.gui.TradeScreen;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 
@@ -84,6 +84,34 @@ public final class CapitalCraftNetwork {
         JsonObject payload = new JsonObject();
         payload.addProperty("amount", amount);
         if (!send("C2S_TRADE_PAY_OFFER", "trade-pay-" + UUID.randomUUID(), payload)) {
+            updateTradeStatus("서버 거래 채널이 아직 준비되지 않았습니다.");
+        }
+    }
+
+    public static void requestTradeState() {
+        if (!send("C2S_TRADE_QUERY", "trade-query-" + UUID.randomUUID(), new JsonObject())) {
+            updateTradeStatus("서버 거래 채널이 아직 준비되지 않았습니다.");
+        }
+    }
+
+    public static void offerTradeMoney(String amount) {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("amount", amount);
+        if (!send("C2S_TRADE_MONEY_OFFER", "trade-money-" + UUID.randomUUID(), payload)) {
+            updateTradeStatus("서버 거래 채널이 아직 준비되지 않았습니다.");
+        }
+    }
+
+    public static void offerTradeItem(String itemAmount) {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("itemAmount", itemAmount);
+        if (!send("C2S_TRADE_ITEM_OFFER", "trade-item-" + UUID.randomUUID(), payload)) {
+            updateTradeStatus("서버 거래 채널이 아직 준비되지 않았습니다.");
+        }
+    }
+
+    public static void clearTradeOffer() {
+        if (!send("C2S_TRADE_CLEAR_OFFER", "trade-clear-" + UUID.randomUUID(), new JsonObject())) {
             updateTradeStatus("서버 거래 채널이 아직 준비되지 않았습니다.");
         }
     }
@@ -166,6 +194,11 @@ public final class CapitalCraftNetwork {
             case "S2C_TRADE_RESULT" -> {
                 boolean success = bool(payload, "success", false);
                 updateTradeStatus(string(payload, "message", success ? "거래 요청 완료" : "거래 요청 실패"));
+            }
+            case "S2C_TRADE_SYNC" -> {
+                if (openTradeScreen != null) {
+                    openTradeScreen.updateTradeState(payload);
+                }
             }
             case "S2C_BALANCE_UPDATED" -> {
                 if (openFinanceScreen != null) {

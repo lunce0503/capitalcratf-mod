@@ -8,7 +8,7 @@ Fabric 1.21.11 client mod for CapitalCraft.
 - Sends a required client handshake with the `finance_ui` feature.
 - Opens the finance screen with the `V` key.
 - Requests the player's balance from the server.
-- Sends transfer requests to the server-side VillageFinance plugin.
+- Sends transfer requests to the server-side CapitalCraft plugin.
 - Opens the trade screen with the `G` key.
 - Sends accepted trade requests for money payments and held-item sales.
 

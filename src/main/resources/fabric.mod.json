@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "id": "capitalcraft-mod",
   "version": "${version}",
-  "name": "CapitalCraft Mod",
-  "description": "Required CapitalCraft Fabric client for finance UI communication with the Paper server.",
+  "name": "CapitalCraft Client",
+  "description": "Required CapitalCraft Fabric client for economy, trade, food industry, and administration UI communication with the Paper server.",
   "authors": [
     "kwon"
   ],
