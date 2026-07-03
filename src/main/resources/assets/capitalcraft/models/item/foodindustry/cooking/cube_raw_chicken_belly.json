@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "capitalcraft:item/foodindustry/cooking/cube_raw_chicken_belly"
+  }
+}
