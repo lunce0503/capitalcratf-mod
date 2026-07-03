@@ -15,18 +15,51 @@ import net.minecraft.client.Minecraft;
 public final class CapitalCraftNetwork {
     private static final Gson GSON = new Gson();
     private static final int PROTOCOL = 1;
+    private static final int HELLO_RETRY_INTERVAL_TICKS = 5;
+    private static final int HELLO_MAX_ATTEMPTS = 80;
     private static FinanceScreen openFinanceScreen;
     private static TradeScreen openTradeScreen;
     private static boolean handshakeAccepted;
+    private static boolean helloPending;
+    private static int helloRetryTicks;
+    private static int helloAttempts;
 
     private CapitalCraftNetwork() {
     }
 
     public static void reset() {
         handshakeAccepted = false;
+        helloPending = false;
+        helloRetryTicks = 0;
+        helloAttempts = 0;
         openFinanceScreen = null;
         openTradeScreen = null;
         ButcheryClientState.reset();
+    }
+
+    public static void queueHello() {
+        helloPending = true;
+        helloRetryTicks = 0;
+        helloAttempts = 0;
+    }
+
+    public static void tick() {
+        if (!helloPending || handshakeAccepted) {
+            return;
+        }
+        if (helloAttempts >= HELLO_MAX_ATTEMPTS) {
+            return;
+        }
+        if (helloRetryTicks > 0) {
+            helloRetryTicks--;
+            return;
+        }
+        helloAttempts++;
+        if (sendHello()) {
+            helloPending = false;
+            return;
+        }
+        helloRetryTicks = HELLO_RETRY_INTERVAL_TICKS;
     }
 
     public static void setOpenFinanceScreen(FinanceScreen screen) {
@@ -49,7 +82,7 @@ public final class CapitalCraftNetwork {
         }
     }
 
-    public static void sendHello() {
+    public static boolean sendHello() {
         JsonObject payload = new JsonObject();
         payload.addProperty("modId", CapitalCraftClientMod.MOD_ID);
         payload.addProperty("modVersion", CapitalCraftClientMod.MOD_VERSION);
@@ -61,7 +94,7 @@ public final class CapitalCraftNetwork {
             "butchery_sync",
             "butchery_hud"
         }));
-        send("C2S_HELLO", "hello-" + UUID.randomUUID(), payload);
+        return send("C2S_HELLO", "hello-" + UUID.randomUUID(), payload);
     }
 
     public static void requestBalance() {

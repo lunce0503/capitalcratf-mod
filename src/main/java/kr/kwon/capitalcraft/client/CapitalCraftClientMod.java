@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public final class CapitalCraftClientMod implements ClientModInitializer {
     public static final String MOD_ID = "capitalcraft-mod";
-    public static final String MOD_VERSION = "0.4.5";
+    public static final String MOD_VERSION = "0.4.6";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static final KeyMapping.Category KEY_CATEGORY =
         KeyMapping.Category.register(Identifier.fromNamespaceAndPath("capitalcraft", "finance"));
@@ -38,7 +38,7 @@ public final class CapitalCraftClientMod implements ClientModInitializer {
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             CapitalCraftNetwork.reset();
-            CapitalCraftNetwork.sendHello();
+            CapitalCraftNetwork.queueHello();
         });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> CapitalCraftNetwork.reset());
         ButcheryHud.register();
@@ -55,6 +55,7 @@ public final class CapitalCraftClientMod implements ClientModInitializer {
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            CapitalCraftNetwork.tick();
             while (financeKey.consumeClick()) {
                 openFinanceScreen(client);
             }
