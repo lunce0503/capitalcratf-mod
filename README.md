@@ -22,6 +22,9 @@ Fabric 1.21.11 client mod for CapitalCraft.
 The Paper plugin renders the MVP car body with vanilla display entities. This Fabric
 mod is still required for input, state synchronization, and the driving HUD.
 
+Version 0.5.1 pairs with the server-side vehicle fixes for a raised driver view,
+safe dismount and remount, and responsive A/D steering.
+
 The server remains authoritative. This mod only provides the client UI and packet transport.
 
 ## Build
