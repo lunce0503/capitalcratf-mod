@@ -3,7 +3,7 @@
   "id": "capitalcraft-mod",
   "version": "${version}",
   "name": "CapitalCraft Client",
-  "description": "Required CapitalCraft Fabric client for economy, trade, food industry, and administration UI communication with the Paper server.",
+  "description": "Required CapitalCraft Fabric client for economy, trade, food industry, vehicles, and administration UI communication with the Paper server.",
   "authors": [
     "kwon"
   ],

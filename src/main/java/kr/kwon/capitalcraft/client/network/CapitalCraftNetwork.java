@@ -6,6 +6,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.util.UUID;
 import kr.kwon.capitalcraft.client.CapitalCraftClientMod;
+import kr.kwon.capitalcraft.client.automotive.VehicleClientState;
+import kr.kwon.capitalcraft.client.automotive.VehicleInputController;
 import kr.kwon.capitalcraft.client.foodindustry.butchery.ButcheryClientState;
 import kr.kwon.capitalcraft.client.economy.gui.FinanceScreen;
 import kr.kwon.capitalcraft.client.economy.gui.TradeScreen;
@@ -35,6 +37,8 @@ public final class CapitalCraftNetwork {
         openFinanceScreen = null;
         openTradeScreen = null;
         ButcheryClientState.reset();
+        VehicleClientState.reset();
+        VehicleInputController.reset();
     }
 
     public static void queueHello() {
@@ -92,7 +96,8 @@ public final class CapitalCraftNetwork {
             "trade_commands",
             "trade_gui",
             "butchery_sync",
-            "butchery_hud"
+            "butchery_hud",
+            "vehicle_v1"
         }));
         return send("C2S_HELLO", "hello-" + UUID.randomUUID(), payload);
     }
@@ -245,6 +250,7 @@ public final class CapitalCraftNetwork {
                 }
             }
             case "S2C_BUTCHERY_SYNC" -> ButcheryClientState.sync(payload);
+            case "S2C_VEHICLE_SNAPSHOT" -> VehicleClientState.sync(payload);
             case "S2C_ERROR" -> {
                 String message = string(payload, "message", "서버 오류");
                 updateScreenStatus(message);
@@ -279,6 +285,28 @@ public final class CapitalCraftNetwork {
             CapitalCraftClientMod.LOGGER.warn("Failed to send CapitalCraft finance packet: {}", type, exception);
             return false;
         }
+    }
+
+    public static boolean sendVehicleInput(
+        UUID vehicleId,
+        long sequence,
+        double throttle,
+        double steering,
+        boolean brake
+    ) {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("vehicleId", vehicleId.toString());
+        payload.addProperty("sequence", sequence);
+        payload.addProperty("throttle", throttle);
+        payload.addProperty("steering", steering);
+        payload.addProperty("brake", brake);
+        return send("C2S_VEHICLE_INPUT", null, payload);
+    }
+
+    public static boolean sendVehicleExit(UUID vehicleId) {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("vehicleId", vehicleId.toString());
+        return send("C2S_VEHICLE_EXIT", "vehicle-exit-" + UUID.randomUUID(), payload);
     }
 
     private static void updateScreenStatus(String message) {
