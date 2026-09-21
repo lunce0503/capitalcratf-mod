@@ -34,3 +34,18 @@ java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
 }
+
+// Exercise the native ModelPart mesh/UV submission without requiring a GPU/window.
+tasks.register('verifyMariMesh', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'kr.kwon.capitalcraft.client.resident.render.MariMeshVerification'
+    jvmArgs '-Djava.awt.headless=true'
+}
+
+// The verification source is an executable headless harness rather than a JUnit test.
+tasks.named('test') {
+    failOnNoDiscoveredTests = false
+}
+
+check.dependsOn verifyMariMesh

@@ -23,11 +23,14 @@ Fabric 1.21.11 client mod for CapitalCraft.
 The Paper plugin renders the MVP car body with vanilla display entities. This Fabric
 mod is still required for input, state synchronization, and the driving HUD.
 
-Version 0.6.1 adds the `resident_appearance_v1` handshake feature, keeps ordinary
-villagers on the vanilla renderer, and renders residents assigned the `mari`
-appearance with the bundled fox-ear veil model, palette texture, and animation.
+Version 0.7.0 replaces Mari's box-based model with a shared, faceted mesh matching
+the reference silhouette: pointed fox ears, long lined veil, braided peach hair,
+flared dress, floral ornament, embroidered gold trim and a star-shaped halo.
+The in-game model, editable OBJ and software preview use the same geometry.
+The `resident_appearance_v1` handshake keeps ordinary villagers on the vanilla
+renderer and applies the custom appearance only to residents assigned `mari`.
 
-The server remains authoritative. This mod only provides the client UI and packet transport.
+The server remains authoritative. This mod provides UI, input transport and rendering.
 
 ## Build
 
@@ -36,3 +39,8 @@ env JAVA_HOME=/path/to/jdk-21 ./gradlew clean build
 ```
 
 The release jar is generated under `build/libs/`.
+
+`check` runs `verifyMariMesh`, which exercises Minecraft's native ModelPart vertex
+submission and checks geometry, palette UVs, normals and animation reset headlessly.
+Regenerate the mesh with `node tools/generate-mari-resident-model.mjs` and its actual
+four-view preview with `node tools/render-mari-preview.mjs`.
