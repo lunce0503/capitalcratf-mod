@@ -17,4 +17,3 @@ public final class ResidentRendering {
         EntityRendererRegistry.register(EntityType.VILLAGER, ResidentAwareVillagerRenderer::new);
     }
 }
-

@@ -43,4 +43,3 @@ public final class ResidentClientState {
         APPEARANCES.clear();
     }
 }
-

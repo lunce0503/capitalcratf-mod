@@ -397,6 +397,8 @@ const manifest = {
 };
 
 fs.mkdirSync(outputDir, { recursive: true });
+while (obj.at(-1) === "") obj.pop();
+while (mtl.at(-1) === "") mtl.pop();
 fs.writeFileSync(path.join(outputDir, "mari-resident.obj"), `${obj.join("\n")}\n`);
 fs.writeFileSync(path.join(outputDir, "mari-resident.mtl"), `${mtl.join("\n")}\n`);
 fs.writeFileSync(path.join(outputDir, "mari-resident-model.json"), `${JSON.stringify(manifest, null, 2)}\n`);
