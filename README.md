@@ -12,7 +12,7 @@ Fabric 1.21.11 client mod for CapitalCraft.
 - Opens the trade screen with the `G` key.
 - Sends accepted trade requests for money payments and held-item sales.
 - Sends server-authoritative compact-sedan driving input and renders a vehicle speed HUD.
-- Receives server-authoritative resident appearance snapshots and renders the Mari resident model.
+- Receives server-authoritative resident appearance snapshots and renders the Mari and Seia resident models.
 
 ## Vehicle controls
 
@@ -30,6 +30,11 @@ The in-game model, editable OBJ and software preview use the same geometry.
 The `resident_appearance_v1` handshake keeps ordinary villagers on the vanilla
 renderer and applies the custom appearance only to residents assigned `mari`.
 
+Version 0.8.0 adds the `seia` appearance using the same runtime-safe faceted mesh pipeline, with tall
+fox ears, blonde hair, a layered white/blue/gold dress, a large curled fox tail,
+the shoulder bird and an ornate halo. Its runtime JSON, OBJ/MTL and four-view
+preview are all generated from one source.
+
 The server remains authoritative. This mod provides UI, input transport and rendering.
 
 Version 0.7.1 fixes black colours and rectangular faces with Sodium. Mari submits
@@ -45,10 +50,12 @@ env JAVA_HOME=/path/to/jdk-21 ./gradlew clean build
 
 The release jar is generated under `build/libs/`.
 
-`check` runs `verifyMariMesh`, which exercises Minecraft's native ModelPart vertex
-submission and checks geometry, palette UVs, normals and animation reset headlessly.
+`check` runs both resident mesh verifiers, which exercise Minecraft's native
+ModelPart vertex submission and check geometry, palette UVs, signature parts and
+animation reset headlessly.
 Regenerate the mesh with `node tools/generate-mari-resident-model.mjs` and its actual
 four-view preview with `node tools/render-mari-preview.mjs`.
+Use `generate-seia-resident-model.mjs` and `render-seia-preview.mjs` for Seia.
 
 Run the real Fabric/Mixin compatibility checks (Java 21):
 

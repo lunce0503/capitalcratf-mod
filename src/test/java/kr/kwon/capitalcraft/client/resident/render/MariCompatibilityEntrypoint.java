@@ -14,6 +14,7 @@ public final class MariCompatibilityEntrypoint implements PreLaunchEntrypoint {
                 throw new AssertionError("Iris missing");
             }
             MariMeshVerification.main(new String[0]);
+            SeiaMeshVerification.main(new String[0]);
             System.out.println("PASS: real Fabric/Sodium mixins; Iris=" + FabricLoader.getInstance().isModLoaded("iris"));
             System.exit(0);
         } catch (Throwable error) {

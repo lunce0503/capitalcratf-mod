@@ -43,12 +43,19 @@ tasks.register('verifyMariMesh', JavaExec) {
     jvmArgs '-Djava.awt.headless=true'
 }
 
+tasks.register('verifySeiaMesh', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'kr.kwon.capitalcraft.client.resident.render.SeiaMeshVerification'
+    jvmArgs '-Djava.awt.headless=true'
+}
+
 // The verification source is an executable headless harness rather than a JUnit test.
 tasks.named('test') {
     failOnNoDiscoveredTests = false
 }
 
-check.dependsOn verifyMariMesh
+check.dependsOn verifyMariMesh, verifySeiaMesh
 
 // Opt-in compatibility runs use the exact launcher artifacts, remapped by Loom.
 // Sodium/Iris and the test entrypoint are not bundled in the production JAR.

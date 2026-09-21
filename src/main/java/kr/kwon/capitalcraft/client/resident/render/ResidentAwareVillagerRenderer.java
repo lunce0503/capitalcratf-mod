@@ -13,11 +13,13 @@ public final class ResidentAwareVillagerRenderer
     extends EntityRenderer<Villager, ResidentVillagerRenderState> {
     private final VillagerRenderer vanillaRenderer;
     private final MariResidentRenderer mariRenderer;
+    private final SeiaResidentRenderer seiaRenderer;
 
     public ResidentAwareVillagerRenderer(EntityRendererProvider.Context context) {
         super(context);
         this.vanillaRenderer = new VillagerRenderer(context);
         this.mariRenderer = new MariResidentRenderer(context);
+        this.seiaRenderer = new SeiaResidentRenderer(context);
     }
 
     @Override
@@ -40,6 +42,8 @@ public final class ResidentAwareVillagerRenderer
     ) {
         if (state.appearance.equals("mari")) {
             mariRenderer.submit(state, poseStack, collector, cameraState);
+        } else if (state.appearance.equals("seia")) {
+            seiaRenderer.submit(state, poseStack, collector, cameraState);
         } else {
             vanillaRenderer.submit(state, poseStack, collector, cameraState);
         }

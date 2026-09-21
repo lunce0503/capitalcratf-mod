@@ -23,7 +23,7 @@ public final class ResidentClientState {
                 try {
                     UUID entityUuid = UUID.fromString(resident.get("entityUuid").getAsString());
                     String appearance = resident.get("appearance").getAsString();
-                    if (appearance.equals("mari")) {
+                    if (appearance.equals("mari") || appearance.equals("seia")) {
                         next.put(entityUuid, appearance);
                     }
                 } catch (RuntimeException ignored) {

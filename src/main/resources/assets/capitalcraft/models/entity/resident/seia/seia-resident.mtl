@@ -1,0 +1,164 @@
+newmtl white
+Kd 0.968627 0.956863 0.933333
+d 1
+illum 1
+
+newmtl whiteLight
+Kd 1.000000 0.992157 0.972549
+d 1
+illum 1
+
+newmtl whiteShade
+Kd 0.847059 0.858824 0.894118
+d 1
+illum 1
+
+newmtl blueWhite
+Kd 0.858824 0.905882 0.956863
+d 1
+illum 1
+
+newmtl skin
+Kd 1.000000 0.894118 0.815686
+d 1
+illum 1
+
+newmtl skinShade
+Kd 0.929412 0.768627 0.705882
+d 1
+illum 1
+
+newmtl blush
+Kd 0.949020 0.721569 0.709804
+d 1
+illum 1
+
+newmtl mouth
+Kd 0.788235 0.529412 0.529412
+d 1
+illum 1
+
+newmtl hair
+Kd 0.949020 0.827451 0.592157
+d 1
+illum 1
+
+newmtl hairLight
+Kd 1.000000 0.921569 0.741176
+d 1
+illum 1
+
+newmtl hairShade
+Kd 0.862745 0.725490 0.474510
+d 1
+illum 1
+
+newmtl hairDeep
+Kd 0.784314 0.607843 0.384314
+d 1
+illum 1
+
+newmtl ear
+Kd 0.917647 0.694118 0.560784
+d 1
+illum 1
+
+newmtl earInner
+Kd 1.000000 0.956863 0.905882
+d 1
+illum 1
+
+newmtl tailTip
+Kd 1.000000 0.941176 0.811765
+d 1
+illum 1
+
+newmtl navy
+Kd 0.149020 0.231373 0.352941
+d 1
+illum 1
+
+newmtl navyLight
+Kd 0.219608 0.341176 0.482353
+d 1
+illum 1
+
+newmtl blue
+Kd 0.466667 0.607843 0.784314
+d 1
+illum 1
+
+newmtl blueLight
+Kd 0.709804 0.807843 0.909804
+d 1
+illum 1
+
+newmtl gold
+Kd 0.839216 0.717647 0.435294
+d 1
+illum 1
+
+newmtl goldLight
+Kd 0.956863 0.866667 0.627451
+d 1
+illum 1
+
+newmtl goldShade
+Kd 0.666667 0.537255 0.313725
+d 1
+illum 1
+
+newmtl eye
+Kd 0.823529 0.580392 0.694118
+d 1
+illum 1
+
+newmtl eyeLight
+Kd 0.949020 0.792157 0.850980
+d 1
+illum 1
+
+newmtl eyeShade
+Kd 0.615686 0.396078 0.498039
+d 1
+illum 1
+
+newmtl ink
+Kd 0.474510 0.384314 0.450980
+d 1
+illum 1
+
+newmtl halo
+Kd 0.933333 0.835294 0.552941
+d 1
+illum 1
+
+newmtl haloLight
+Kd 1.000000 0.945098 0.721569
+d 1
+illum 1
+
+newmtl shoe
+Kd 0.909804 0.894118 0.886275
+d 1
+illum 1
+
+newmtl sole
+Kd 0.662745 0.611765 0.568627
+d 1
+illum 1
+
+newmtl bird
+Kd 0.933333 0.968627 0.972549
+d 1
+illum 1
+
+newmtl birdBlue
+Kd 0.560784 0.717647 0.788235
+d 1
+illum 1
+
+newmtl beak
+Kd 0.843137 0.635294 0.352941
+d 1
+illum 1

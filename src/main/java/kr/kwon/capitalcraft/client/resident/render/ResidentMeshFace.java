@@ -8,8 +8,8 @@ import net.minecraft.core.Direction;
 import org.joml.Vector3f;
 
 /** An arbitrary mesh face, not a cuboid that Sodium can reconstruct from its bounds. */
-final class MariMeshFace extends ModelPart.Cube {
-    MariMeshFace(Vector3f min, Vector3f max, ModelPart.Vertex[] vertices, Vector3f normal) {
+final class ResidentMeshFace extends ModelPart.Cube {
+    ResidentMeshFace(Vector3f min, Vector3f max, ModelPart.Vertex[] vertices, Vector3f normal) {
         super(0, 0, min.x, min.y, min.z, max.x - min.x, max.y - min.y, max.z - min.z,
             0, 0, 0, false, 64, 64, EnumSet.of(Direction.NORTH));
         polygons[0] = new ModelPart.Polygon(vertices, new Vector3f(normal));

@@ -1,0 +1,20 @@
+{
+  "format": "shared-mesh-v2",
+  "objectCount": 162,
+  "vertexCount": 2244,
+  "faceCount": 2401,
+  "heightBlocks": 2.1481,
+  "foxEarParts": [
+    "left_fox_ear",
+    "right_fox_ear",
+    "left_fox_ear_inner",
+    "right_fox_ear_inner"
+  ],
+  "signatureParts": [
+    "large_fox_tail",
+    "shoulder_bird",
+    "halo_crown_0"
+  ],
+  "runtimeMesh": "seia-mesh.json",
+  "preview": "seia-preview.png"
+}
