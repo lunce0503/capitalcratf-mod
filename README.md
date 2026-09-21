@@ -23,7 +23,7 @@ Fabric 1.21.11 client mod for CapitalCraft.
 The Paper plugin renders the MVP car body with vanilla display entities. This Fabric
 mod is still required for input, state synchronization, and the driving HUD.
 
-Version 0.6.0 adds the `resident_appearance_v1` handshake feature, keeps ordinary
+Version 0.6.1 adds the `resident_appearance_v1` handshake feature, keeps ordinary
 villagers on the vanilla renderer, and renders residents assigned the `mari`
 appearance with the bundled fox-ear veil model, palette texture, and animation.
 

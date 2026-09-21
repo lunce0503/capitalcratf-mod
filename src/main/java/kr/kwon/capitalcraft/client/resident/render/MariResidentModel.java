@@ -15,7 +15,7 @@ import net.minecraft.util.Mth;
 
 public final class MariResidentModel extends EntityModel<ResidentVillagerRenderState> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(
-        Identifier.fromNamespaceAndPath(CapitalCraftClientMod.MOD_ID, "mari_resident"),
+        Identifier.fromNamespaceAndPath(CapitalCraftClientMod.RESOURCE_NAMESPACE, "mari_resident"),
         "main"
     );
 

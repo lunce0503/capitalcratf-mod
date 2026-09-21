@@ -9,7 +9,7 @@ import net.minecraft.world.entity.npc.villager.Villager;
 public final class MariResidentRenderer
     extends MobRenderer<Villager, ResidentVillagerRenderState, MariResidentModel> {
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(
-        CapitalCraftClientMod.MOD_ID,
+        CapitalCraftClientMod.RESOURCE_NAMESPACE,
         "textures/entity/resident/mari.png"
     );
 
