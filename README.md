@@ -32,6 +32,11 @@ renderer and applies the custom appearance only to residents assigned `mari`.
 
 The server remains authoritative. This mod provides UI, input transport and rendering.
 
+Version 0.7.1 fixes black colours and rectangular faces with Sodium. Mari submits
+its own polygon vertices through the active vertex consumer, bypassing Sodium's
+cached cuboid geometry. Other entities still use Sodium normally. Palette UVs span
+a small area within each solid colour tile for shader tangent calculations.
+
 ## Build
 
 ```bash
@@ -44,3 +49,15 @@ The release jar is generated under `build/libs/`.
 submission and checks geometry, palette UVs, normals and animation reset headlessly.
 Regenerate the mesh with `node tools/generate-mari-resident-model.mjs` and its actual
 four-view preview with `node tools/render-mari-preview.mjs`.
+
+Run the real Fabric/Mixin compatibility checks (Java 21):
+
+```bash
+./gradlew runMariCompatibility -PmariCompatibility=sodium
+./gradlew runMariCompatibility -PmariCompatibility=iris
+```
+
+These use the launcher's Sodium 0.8.12 and Iris 1.10.7. A fast-path-capable vertex
+consumer verifies that Sodium optimizes a vanilla control cube but does not replace
+Mari's 2,773 mesh faces. They exit before window creation; they do not claim a GPU
+shader-pack screenshot test. The verification mod is excluded from release JARs.

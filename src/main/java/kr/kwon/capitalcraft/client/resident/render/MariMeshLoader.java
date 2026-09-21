@@ -7,14 +7,12 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import kr.kwon.capitalcraft.client.CapitalCraftClientMod;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.joml.Vector3f;
@@ -79,7 +77,12 @@ public final class MariMeshLoader {
                     // Authoring is Y-up/+Z-front; ModelParts are Y-down/-Z-front.
                     p.mul(scale, -scale, -scale);
                     positions[i] = p;
-                    polygon[i] = new ModelPart.Vertex(p.x, p.y, p.z, u, v);
+                    // A small UV square within the solid palette cell also gives shader
+                    // tangent calculations a non-zero UV area. Triangles repeat vertex 3.
+                    int corner = Math.min(i, count - 1);
+                    float du = (corner == 0 || corner == 3 ? -1 : 1) / 64.0F;
+                    float dv = (corner < 2 ? -1 : 1) / 64.0F;
+                    polygon[i] = new ModelPart.Vertex(p.x, p.y, p.z, u + du, v + dv);
                 }
                 Vector3f normal = new Vector3f(positions[1]).sub(positions[0])
                     .cross(new Vector3f(positions[2]).sub(positions[0]));
@@ -87,13 +90,7 @@ public final class MariMeshLoader {
                 normal.normalize();
                 Vector3f min = new Vector3f(positions[0]), max = new Vector3f(positions[0]);
                 for (Vector3f p : positions) { min.min(p); max.max(p); }
-                // Native ModelPart submission keeps normals/UVs on Minecraft's render path.
-                // Triangles repeat vertex 3 to make the second GPU triangle degenerate.
-                ModelPart.Cube cube = new ModelPart.Cube(0, 0, min.x, min.y, min.z,
-                    max.x - min.x, max.y - min.y, max.z - min.z,
-                    0, 0, 0, false, 64, 64, EnumSet.of(Direction.NORTH));
-                cube.polygons[0] = new ModelPart.Polygon(polygon, normal);
-                geometry.get(bone).add(cube);
+                geometry.get(bone).add(new MariMeshFace(min, max, polygon, normal));
             }
         }
         Map<String, ModelPart> children = new LinkedHashMap<>();

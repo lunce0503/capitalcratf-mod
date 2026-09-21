@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 public final class CapitalCraftClientMod implements ClientModInitializer {
     public static final String MOD_ID = "capitalcraft-mod";
     public static final String RESOURCE_NAMESPACE = "capitalcraft";
-    public static final String MOD_VERSION = "0.7.0";
+    public static final String MOD_VERSION = "0.7.1";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static final KeyMapping.Category KEY_CATEGORY =
         KeyMapping.Category.register(Identifier.fromNamespaceAndPath("capitalcraft", "finance"));

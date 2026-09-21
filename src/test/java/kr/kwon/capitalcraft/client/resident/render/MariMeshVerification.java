@@ -13,8 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.EnumSet;
 import javax.imageio.ImageIO;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.core.Direction;
 
 /** Verifies resource lookup, native submitted geometry, UV colours and animation reset. */
 public final class MariMeshVerification {
@@ -28,6 +30,12 @@ public final class MariMeshVerification {
             data = JsonParser.parseReader(input).getAsJsonObject();
         }
         try (var input = new java.io.StringReader(data.toString())) { root = MariMeshLoader.bake(input); }
+        root.visit(new PoseStack(), (pose, path, index, cube) -> {
+            var v = cube.polygons[0].vertices();
+            float area = (v[1].u()-v[0].u())*(v[2].v()-v[0].v())
+                - (v[2].u()-v[0].u())*(v[1].v()-v[0].v());
+            require(Math.abs(area)>1e-7, "Shader tangent UV area must be non-zero");
+        });
         require(data.get("texture").getAsString().equals(MariMeshLoader.TEXTURE.toString()), "Texture ID mismatch");
         String texturePath = "/assets/" + MariMeshLoader.TEXTURE.getNamespace() + "/" + MariMeshLoader.TEXTURE.getPath();
         BufferedImage texture = ImageIO.read(Objects.requireNonNull(MariMeshVerification.class.getResourceAsStream(texturePath)));
@@ -51,12 +59,24 @@ public final class MariMeshVerification {
             }
         }
         int[] submitted = {0};
+        int[] fastPathCalls = {0};
         boolean[] compareMesh = {true};
+        boolean compatibility = Boolean.getBoolean("capitalcraft.verifyMariCompatibility");
+        List<Class<?>> interfaces = new ArrayList<>(List.of(VertexConsumer.class));
+        if (compatibility) {
+            require(java.util.Arrays.stream(ModelPart.Cube.class.getDeclaredFields())
+                .anyMatch(field -> field.getName().contains("sodium$cuboid")), "Sodium CubeMixin is actually applied");
+            interfaces.add(Class.forName("net.caffeinemc.mods.sodium.api.vertex.buffer.VertexBufferWriter"));
+        }
         VertexConsumer consumer = (VertexConsumer) Proxy.newProxyInstance(VertexConsumer.class.getClassLoader(),
-            new Class<?>[]{VertexConsumer.class}, (proxy, method, values) -> {
+            interfaces.toArray(Class<?>[]::new), (proxy, method, values) -> {
+                if (method.getName().equals("canUseIntrinsics")) return true;
+                if (method.getName().equals("push")) { fastPathCalls[0]++; return null; }
                 if (method.getName().equals("addVertex") && values.length == 11) {
                     float x=(float) values[0], y=(float) values[1], z=(float) values[2];
                     float u=(float) values[4], v=(float) values[5];
+                    require((int)values[3] == -1 && (int)values[6] == 0 && (int)values[7] == 0xf000f0,
+                        "Preserve vertex colour, overlay and light");
                     require(Float.isFinite(x) && Float.isFinite(y) && Float.isFinite(z), "Finite position");
                     require(u > 0 && u < 1 && v > 0 && v < 1, "UV in texture");
                     int material = (int)(v*8)*8 + (int)(u*8);
@@ -84,6 +104,7 @@ public final class MariMeshVerification {
             });
         root.render(new PoseStack(),consumer,0xf000f0,0);
         require(submitted[0] == faces*4, "All faces submitted");
+        require(fastPathCalls[0] == 0, "Mari must not use the cached cuboid fast path");
         require(expected.values().stream().allMatch(List::isEmpty), "All authoring vertices were matched");
         compareMesh[0]=false;
         MariResidentModel model = new MariResidentModel(root);
@@ -95,6 +116,15 @@ public final class MariMeshVerification {
         require(Math.abs(root.getChild("halo").y-haloY)<1e-6, "Animation must not accumulate offsets");
         require(Math.abs(root.getChild("head").yRot)<.7F, "Head rotation limited");
         root.render(new PoseStack(),consumer,0xf000f0,0);
+        require(fastPathCalls[0] == 0, "Animated Mari must also bypass the cuboid cache");
+        if (compatibility) {
+            // Positive control: the same consumer MUST activate Sodium for a vanilla cube.
+            // This prevents a false pass caused by running the vanilla fallback again.
+            new ModelPart.Cube(0,0,0,0,0,1,1,1,0,0,0,false,64,64,EnumSet.allOf(Direction.class))
+                .compile(new PoseStack().last(),consumer,0xf000f0,0,-1);
+            require(fastPathCalls[0] > 0, "Sodium fast path positive control");
+            System.out.println("PASS: Sodium fast path runs for vanilla cubes, never for Mari faces");
+        }
         try (var bad = new java.io.StringReader("{\"format\":99}")) {
             try { MariMeshLoader.bake(bad); throw new AssertionError("Invalid format accepted"); }
             catch(IllegalArgumentException expectedException) { /* intended rejection */ }

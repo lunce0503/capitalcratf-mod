@@ -49,3 +49,31 @@ tasks.named('test') {
 }
 
 check.dependsOn verifyMariMesh
+
+// Opt-in compatibility runs use the exact launcher artifacts, remapped by Loom.
+// Sodium/Iris and the test entrypoint are not bundled in the production JAR.
+if (providers.gradleProperty('mariCompatibility').isPresent()) {
+    repositories { maven { url = 'https://api.modrinth.com/maven' } }
+    dependencies {
+        modLocalRuntime 'maven.modrinth:sodium:mc1.21.11-0.8.12-fabric'
+        if (providers.gradleProperty('mariCompatibility').get() == 'iris') {
+            modLocalRuntime 'maven.modrinth:iris:fDpuVzVr'
+        }
+    }
+    loom {
+        mods {
+            'capitalcraft-mod' { sourceSet sourceSets.main }
+            'capitalcraft-render-verification' { sourceSet sourceSets.test }
+        }
+        runs {
+            mariCompatibility {
+                client()
+                source sourceSets.test
+                runDir 'build/mari-compatibility'
+                vmArg '-Dcapitalcraft.verifyMariCompatibility=true'
+                vmArg "-Dcapitalcraft.verifyIris=${providers.gradleProperty('mariCompatibility').get() == 'iris'}"
+                vmArg '-Djava.awt.headless=true'
+            }
+        }
+    }
+}
