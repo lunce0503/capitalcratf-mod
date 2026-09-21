@@ -7,6 +7,8 @@ import kr.kwon.capitalcraft.client.economy.gui.FinanceScreen;
 import kr.kwon.capitalcraft.client.economy.gui.TradeScreen;
 import kr.kwon.capitalcraft.client.network.CapitalCraftNetwork;
 import kr.kwon.capitalcraft.client.network.FinancePayload;
+import kr.kwon.capitalcraft.client.resident.ResidentClientState;
+import kr.kwon.capitalcraft.client.resident.render.ResidentRendering;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -23,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 public final class CapitalCraftClientMod implements ClientModInitializer {
     public static final String MOD_ID = "capitalcraft-mod";
-    public static final String MOD_VERSION = "0.5.1";
+    public static final String MOD_VERSION = "0.6.0";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static final KeyMapping.Category KEY_CATEGORY =
         KeyMapping.Category.register(Identifier.fromNamespaceAndPath("capitalcraft", "finance"));
@@ -42,9 +44,13 @@ public final class CapitalCraftClientMod implements ClientModInitializer {
             CapitalCraftNetwork.reset();
             CapitalCraftNetwork.queueHello();
         });
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> CapitalCraftNetwork.reset());
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            CapitalCraftNetwork.reset();
+            ResidentClientState.reset();
+        });
         ButcheryHud.register();
         VehicleHud.register();
+        ResidentRendering.register();
 
         financeKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "key.capitalcraft.finance",

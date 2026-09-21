@@ -1,0 +1,52 @@
+{
+  "format": "wavefront-obj",
+  "character": "Mari-inspired CapitalCraft resident fan model",
+  "coordinateSystem": "Y-up, meters-like Minecraft block units",
+  "bounds": {
+    "min": [
+      -0.576,
+      0,
+      -0.585
+    ],
+    "max": [
+      0.576,
+      2.986,
+      0.585
+    ]
+  },
+  "dimensions": {
+    "width": 1.152,
+    "height": 2.986,
+    "depth": 1.17
+  },
+  "objectCount": 101,
+  "vertexCount": 794,
+  "materials": [
+    "cloth_black",
+    "veil_black",
+    "shoe_black",
+    "white",
+    "skin",
+    "blush",
+    "mouth",
+    "hair",
+    "cyan",
+    "eye_dark",
+    "teal",
+    "gold",
+    "halo",
+    "ear_inner",
+    "flower_blue"
+  ],
+  "foxEarParts": [
+    "left_fox_ear",
+    "right_fox_ear",
+    "left_fox_ear_inner",
+    "right_fox_ear_inner"
+  ],
+  "notes": [
+    "Long pointed veil ears are intentionally modeled as fox ears.",
+    "Import mari-resident.obj with mari-resident.mtl into Blockbench, Blender, or another OBJ editor.",
+    "The model is an original low-poly fan interpretation based on user-supplied references."
+  ]
+}

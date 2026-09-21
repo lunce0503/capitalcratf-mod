@@ -9,6 +9,7 @@ import kr.kwon.capitalcraft.client.CapitalCraftClientMod;
 import kr.kwon.capitalcraft.client.automotive.VehicleClientState;
 import kr.kwon.capitalcraft.client.automotive.VehicleInputController;
 import kr.kwon.capitalcraft.client.foodindustry.butchery.ButcheryClientState;
+import kr.kwon.capitalcraft.client.resident.ResidentClientState;
 import kr.kwon.capitalcraft.client.economy.gui.FinanceScreen;
 import kr.kwon.capitalcraft.client.economy.gui.TradeScreen;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -39,6 +40,7 @@ public final class CapitalCraftNetwork {
         ButcheryClientState.reset();
         VehicleClientState.reset();
         VehicleInputController.reset();
+        ResidentClientState.reset();
     }
 
     public static void queueHello() {
@@ -97,7 +99,8 @@ public final class CapitalCraftNetwork {
             "trade_gui",
             "butchery_sync",
             "butchery_hud",
-            "vehicle_v1"
+            "vehicle_v1",
+            "resident_appearance_v1"
         }));
         return send("C2S_HELLO", "hello-" + UUID.randomUUID(), payload);
     }
@@ -251,6 +254,7 @@ public final class CapitalCraftNetwork {
             }
             case "S2C_BUTCHERY_SYNC" -> ButcheryClientState.sync(payload);
             case "S2C_VEHICLE_SNAPSHOT" -> VehicleClientState.sync(payload);
+            case "S2C_RESIDENT_SNAPSHOT" -> ResidentClientState.sync(payload);
             case "S2C_ERROR" -> {
                 String message = string(payload, "message", "서버 오류");
                 updateScreenStatus(message);

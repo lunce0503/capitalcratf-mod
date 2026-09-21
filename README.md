@@ -12,6 +12,7 @@ Fabric 1.21.11 client mod for CapitalCraft.
 - Opens the trade screen with the `G` key.
 - Sends accepted trade requests for money payments and held-item sales.
 - Sends server-authoritative compact-sedan driving input and renders a vehicle speed HUD.
+- Receives server-authoritative resident appearance snapshots and renders the Mari resident model.
 
 ## Vehicle controls
 
@@ -22,8 +23,9 @@ Fabric 1.21.11 client mod for CapitalCraft.
 The Paper plugin renders the MVP car body with vanilla display entities. This Fabric
 mod is still required for input, state synchronization, and the driving HUD.
 
-Version 0.5.1 pairs with the server-side vehicle fixes for a raised driver view,
-safe dismount and remount, and responsive A/D steering.
+Version 0.6.0 adds the `resident_appearance_v1` handshake feature, keeps ordinary
+villagers on the vanilla renderer, and renders residents assigned the `mari`
+appearance with the bundled fox-ear veil model, palette texture, and animation.
 
 The server remains authoritative. This mod only provides the client UI and packet transport.
 
