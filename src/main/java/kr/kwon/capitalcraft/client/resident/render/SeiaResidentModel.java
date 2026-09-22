@@ -34,8 +34,9 @@ public final class SeiaResidentModel extends EntityModel<ResidentVillagerRenderS
         float headY = Mth.clamp(state.yRot, -40, 40) * Mth.DEG_TO_RAD;
         head.xRot = headX;
         head.yRot = headY;
-        hair.xRot = headX * 0.72F;
-        hair.yRot = headY * 0.72F;
+        // The crown, fringe and ear roots must stay attached through head turns.
+        hair.xRot = headX;
+        hair.yRot = headY;
         float walk = state.walkAnimationPos * 0.6662F;
         float speed = Mth.clamp(state.walkAnimationSpeed, 0, 1);
         rightLeg.xRot = Mth.cos(walk) * 0.46F * speed;

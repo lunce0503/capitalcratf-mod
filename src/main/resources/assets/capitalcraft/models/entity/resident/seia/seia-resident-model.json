@@ -1,8 +1,8 @@
 {
   "format": "shared-mesh-v2",
-  "objectCount": 162,
-  "vertexCount": 2244,
-  "faceCount": 2401,
+  "objectCount": 166,
+  "vertexCount": 2509,
+  "faceCount": 2827,
   "heightBlocks": 2.1481,
   "foxEarParts": [
     "left_fox_ear",

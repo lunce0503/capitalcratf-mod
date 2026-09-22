@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { writePng } from './mari-png.mjs';
+import { roundedFace } from './resident-head-geometry.mjs';
 
 const base = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const output = path.join(base, 'src/main/resources/assets/capitalcraft/models/entity/resident/mari');
@@ -135,14 +136,11 @@ for(const s of [-1,1]) {
 }
 box('back_bow_knot','body',[0,1.054,-.275],[.107,.107,.074],'goldLight',Math.PI/4);
 
-// Chamfered face: flat front, rounded sides, tapered jaw (not a giant cube).
-function headRing(y,w,d,z=0) {
-  return [[-w*.73,y,z+d],[w*.73,y,z+d],[w,y,z+d*.67],[w,y,z-d*.62],[w*.72,y,z-d],[-w*.72,y,z-d],[-w,y,z-d*.62],[-w,y,z+d*.67]];
-}
-const hv=[...headRing(1.61,.232,.23,.025),...headRing(1.67,.3,.255,.025),...headRing(2.075,.326,.261,.02),...headRing(2.145,.272,.223,.005)];
-const hf=[]; for(let j=0;j<3;j++)for(let i=0;i<8;i++)hf.push([j*8+i,j*8+(i+1)%8,(j+1)*8+(i+1)%8,(j+1)*8+i]);
-hf.push([24,25,26,27],[24,27,28,29],[24,29,30,31],[0,3,2,1],[0,5,4,3],[0,7,6,5]);
-mesh('soft_face','head',hv,hf,'skin');
+// Full cheeks blend into a rounded jaw, with the widest ring below the eyes.
+const facePoint=roundedFace(mesh,[[1.60,.22,.217,.025],[1.635,.282,.245,.025,.003],
+  [1.68,.331,.275,.025,.02],[1.725,.357,.282,.025,.027],[1.765,.354,.27,.025,.014],
+  [1.81,.335,.261,.02],[1.91,.326,.261,.02],[2.075,.326,.261,.02],[2.145,.272,.223,.005]]);
+const eyeStart=objects.length;
 for(const s of [-1,1]) {
   const x=s*.143;
   panel(`eye_white_${s}`,'head',[[x-.084,1.86,.287],[x+.084,1.86,.287],[x+.079,1.776,.287],[x-.079,1.776,.287]],'whiteLight');
@@ -153,10 +151,14 @@ for(const s of [-1,1]) {
   box(`catchlight_${s}`,'head',[x-.018,1.843,.32],[.024,.024,.006],'whiteLight');
   panel(`eyelash_${s}`,'head',[[x-.086,1.881,.308],[x+.085,1.876,.308],[x+.095,1.848,.309],[x-.086,1.854,.309]],'ink');
   box(`eyebrow_${s}`,'head',[x,1.912,.29],[.11,.013,.011],'hairShade',s*.07);
-  box(`blush_${s}`,'head',[s*.231,1.727,.286],[.048,.013,.006],'blush');
 }
-box('small_mouth','head',[0,1.672,.27],[.043,.008,.008],'mouth');
-jewel('nose','head',[0,1.749,.295],.012,'skinShade');
+for(const o of objects.slice(eyeStart)) o.vertices=o.vertices.map(([x,y,z])=>[x,y,+(z+.01).toFixed(5)]);
+for(const s of [-1,1]) panel(`blush_${s}`,'head',[
+  facePoint(s*.226-.026,1.735,.01),facePoint(s*.226+.026,1.735,.01),
+  facePoint(s*.226+.026,1.72,.01),facePoint(s*.226-.026,1.72,.01)],'blush',.004);
+panel('small_mouth','head',[facePoint(-.0215,1.676),facePoint(.0215,1.676),
+  facePoint(.0215,1.668),facePoint(-.0215,1.668)],'mouth',.004);
+jewel('nose','head',facePoint(0,1.749,.008),.012,'skinShade');
 
 // Hair cap, individual pointed fringe locks, side tresses and a woven braid.
 rings('hair_cap','head',[[0,1.74,-.05,.336,.27],[0,2.10,-.03,.365,.305],[0,2.22,-.04,.29,.25]],'hair',12);
@@ -165,6 +167,10 @@ for(const [i,x] of [-.244,-.124,0,.124,.244].entries()) {
   lock(`fringe_${i}`,[[x,2.17,.276,.077,.045],[x*1.04,2.064,.313,.085,.055],[x*.96,1.985,.328,.067,.05],[x*.91,bottom,.304,.009,.019]]);
 }
 for(const s of [-1,1]) {
+  // Overlap both the outer fringe and the forward side tress at the temple.
+  lock(`temple_hair_${s}`,[[s*.271,2.16,.244,.083,.113],
+    [s*.305,2.04,.257,.077,.105],[s*.319,1.92,.244,.063,.078],
+    [s*.317,1.82,.223,.036,.049],[s*.305,1.77,.213,.009,.014]]);
   for(let i=0;i<3;i++) lock(`side_hair_${s}_${i}`,[[s*(.268+i*.046),2.12,.175-i*.077,.061,.075],[s*(.32+i*.04),1.91,.184-i*.07,.065,.069],[s*(.307+i*.034),1.67,.204-i*.06,.062,.067],[s*(.265+i*.03),1.49,.236-i*.045,.013,.022]]);
   if(s>0) lock('long_side_tress',[[.32,1.81,.221,.063,.055],[.283,1.57,.246,.057,.046],[.251,1.31,.254,.041,.036],[.229,1.2,.269,.006,.008]]);
 }

@@ -37,6 +37,13 @@ preview are all generated from one source.
 
 The server remains authoritative. This mod provides UI, input transport and rendering.
 
+Version 0.8.1 rounds Mari's and Seia's cheeks and jawlines, fills the temple gaps
+between fringe and side hair, and embeds Seia's fox ears in the crown with fur
+at the roots. Seia's hair follows the same head rotation so the ear/hair seams
+stay closed while looking around. Blush and mouth details follow the new face.
+Run `node tools/render-resident-heads.mjs` for front, three-quarter and side
+close-ups of both runtime meshes (`build/resident-heads.png`).
+
 Version 0.7.1 fixes black colours and rectangular faces with Sodium. Mari submits
 its own polygon vertices through the active vertex consumer, bypassing Sodium's
 cached cuboid geometry. Other entities still use Sodium normally. Palette UVs span
@@ -66,5 +73,5 @@ Run the real Fabric/Mixin compatibility checks (Java 21):
 
 These use the launcher's Sodium 0.8.12 and Iris 1.10.7. A fast-path-capable vertex
 consumer verifies that Sodium optimizes a vanilla control cube but does not replace
-Mari's 2,773 mesh faces. They exit before window creation; they do not claim a GPU
+Mari's mesh faces. They exit before window creation; they do not claim a GPU
 shader-pack screenshot test. The verification mod is excluded from release JARs.

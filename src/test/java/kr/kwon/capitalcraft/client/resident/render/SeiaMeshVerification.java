@@ -80,6 +80,18 @@ public final class SeiaMeshVerification {
         require(Math.abs(root.getChild("halo").y-haloY)<1e-6, "Animation must not accumulate offsets");
         require(Math.abs(root.getChild("tail").yRot-tailYRot)<1e-6, "Tail animation must reset");
         require(Math.abs(root.getChild("head").yRot)<.7F, "Head rotation limited");
+        // Different hair/head transforms previously pulled the crown away from the ears.
+        for (float pitch : new float[]{-18, 0, 18}) for (float yaw : new float[]{-40, 0, 40}) {
+            state.xRot = pitch;
+            state.yRot = yaw;
+            model.setupAnim(state);
+            var head = root.getChild("head");
+            var hair = root.getChild("hair");
+            require(Math.abs(head.xRot-hair.xRot)<1e-6 && Math.abs(head.yRot-hair.yRot)<1e-6
+                && Math.abs(head.zRot-hair.zRot)<1e-6 && Math.abs(head.x-hair.x)<1e-6
+                && Math.abs(head.y-hair.y)<1e-6 && Math.abs(head.z-hair.z)<1e-6,
+                "Crown and fox ears must remain attached at every head rotation");
+        }
         root.render(new PoseStack(), consumer, 0xf000f0, 0);
         require(fastPathCalls[0] == 0, "Animated Seia must bypass the cuboid cache");
         try (var bad = new java.io.StringReader("{\"format\":99}")) {

@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { writePng } from './mari-png.mjs';
+import { roundedFace } from './resident-head-geometry.mjs';
 
 const base = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const output = path.join(base, 'src/main/resources/assets/capitalcraft/models/entity/resident/seia');
@@ -117,11 +118,11 @@ for(const s of [-1,1]) {
   rings(`${bone}_glove`,bone,[[s*.505,.81,.073,.106,.116],[s*.52,.68,.083,.095,.105]],'whiteLight',10,['white','whiteLight','white','whiteShade']);
 }
 
-// Soft faceted face with half-lidded rose eyes.
-function headRing(y,w,d,z=.02){return [[-w*.72,y,z+d],[w*.72,y,z+d],[w,y,z+d*.66],[w,y,z-d*.62],[w*.72,y,z-d],[-w*.72,y,z-d],[-w,y,z-d*.62],[-w,y,z+d*.66]];}
-const hv=[...headRing(1.61,.225,.222),...headRing(1.67,.292,.25),...headRing(2.07,.319,.258),...headRing(2.145,.267,.22,.005)],hf=[];
-for(let j=0;j<3;j++)for(let i=0;i<8;i++)hf.push([j*8+i,j*8+(i+1)%8,(j+1)*8+(i+1)%8,(j+1)*8+i]);
-hf.push([24,25,26,27],[24,27,28,29],[24,29,30,31],[0,3,2,1],[0,5,4,3],[0,7,6,5]);mesh('soft_face','head',hv,hf,'skin');
+// Full lower cheeks and a soft jaw keep the half-lidded expression readable.
+const facePoint=roundedFace(mesh,[[1.60,.215,.211,.025],[1.635,.275,.24,.025,.003],
+  [1.68,.323,.268,.025,.018],[1.725,.349,.279,.025,.026],[1.765,.347,.265,.025,.013],
+  [1.81,.329,.258,.02],[1.91,.319,.258,.02],[2.07,.319,.258,.02],[2.145,.267,.22,.005]]);
+const eyeStart=objects.length;
 for(const s of [-1,1]) {
   const x=s*.139;
   panel(`eye_white_${s}`,'head',[[x-.086,1.853,.283],[x+.086,1.853,.283],[x+.074,1.792,.288],[x-.069,1.79,.288]],'whiteLight');
@@ -130,15 +131,25 @@ for(const s of [-1,1]) {
   box(`pupil_${s}`,'head',[x,1.824,.312],[.019,.044,.007],'eyeShade');
   panel(`sleepy_lash_${s}`,'head',[[x-.092,1.875,.307],[x+.09,1.868,.307],[x+.104,1.846,.308],[x-.086,1.852,.308]],'ink');
   box(`eyebrow_${s}`,'head',[x,1.925,.288],[.105,.012,.01],'hairShade',s*.04);
-  box(`blush_${s}`,'head',[s*.225,1.731,.279],[.053,.013,.006],'blush');
 }
-box('small_mouth','head',[0,1.683,.269],[.041,.008,.008],'mouth');
+for(const o of objects.slice(eyeStart)) o.vertices=o.vertices.map(([x,y,z])=>[x,y,+(z+.01).toFixed(5)]);
+for(const s of [-1,1]) panel(`blush_${s}`,'head',[
+  facePoint(s*.22-.026,1.739,.01),facePoint(s*.22+.026,1.739,.01),
+  facePoint(s*.22+.026,1.724,.01),facePoint(s*.22-.026,1.724,.01)],'blush',.004);
+panel('small_mouth','head',[facePoint(-.0205,1.687),facePoint(.0205,1.687),
+  facePoint(.0205,1.679),facePoint(-.0205,1.679)],'mouth',.004);
 
 // Golden hair cap, parted fringe and very long side/back locks.
 rings('hair_cap','hair',[[0,1.72,-.045,.325,.265],[0,2.08,-.035,.354,.295],[0,2.205,-.052,.286,.245]],'hair',12,['hair','hairLight','hair','hairShade']);
 for(const [i,x] of [-.245,-.12,.015,.14,.25].entries()) {
   const end=i===1?1.80:i===2?1.89:1.92;
   lock(`fringe_${i}`,'hair',[[x,2.16,.282,.073,.045],[x*.98,2.04,.318,.079,.052],[x*.91,end,.303,.009,.016]]);
+}
+for(const s of [-1,1]) {
+  // Broad roots close the forehead/side gap, tapering into the long locks.
+  lock(`temple_hair_${s}`,'hair',[[s*.265,2.18,.222,.093,.128],
+    [s*.301,2.065,.241,.086,.127],[s*.326,1.96,.221,.067,.113],
+    [s*.336,1.84,.183,.047,.081],[s*.334,1.75,.15,.012,.024]]);
 }
 for(const s of [-1,1]) for(let i=0;i<4;i++) {
   const outer=i*.045;
@@ -148,7 +159,11 @@ for(let i=0;i<7;i++) lock(`back_hair_${i}`,'hair',[[(-.24+i*.08),2.08,-.18,.065,
 
 // Tall, unmistakably tapered fox ears with cream inner fur and small flowers.
 for(const s of [-1,1]) {
-  panel(`${s<0?'left':'right'}_fox_ear`,'head',[[s*.10,2.18,.025],[s*.37,2.17,.005],[s*.35,2.64,-.055]],'ear',.15);
+  // The solid ear is embedded in the crown; golden root fur covers the seam.
+  panel(`${s<0?'left':'right'}_fox_ear`,'head',[[s*.095,2.095,.025],[s*.35,2.095,.005],[s*.35,2.64,-.055]],'ear',.15);
+  rings(`fox_ear_root_${s}`,'head',[[s*.245,2.075,-.048,.128,.137],
+    [s*.258,2.145,-.047,.119,.126],[s*.279,2.215,-.049,.086,.103],
+    [s*.296,2.255,-.05,.055,.085]],'hair',10,['hair','hairLight','hair','hairShade']);
   panel(`${s<0?'left':'right'}_fox_ear_inner`,'head',[[s*.185,2.225,.101],[s*.318,2.22,.087],[s*.326,2.51,-.006]],'earInner');
   panel(`fox_ear_inner_shadow_${s}`,'head',[[s*.232,2.26,.111],[s*.303,2.255,.101],[s*.316,2.43,.039]],'hairLight');
   for(let i=0;i<3;i++) {
