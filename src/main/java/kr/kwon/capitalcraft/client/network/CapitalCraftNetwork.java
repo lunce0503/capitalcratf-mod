@@ -92,7 +92,7 @@ public final class CapitalCraftNetwork {
         JsonObject payload = new JsonObject();
         payload.addProperty("modId", CapitalCraftClientMod.MOD_ID);
         payload.addProperty("modVersion", CapitalCraftClientMod.MOD_VERSION);
-        payload.addProperty("minecraftVersion", "1.21.11");
+        payload.addProperty("minecraftVersion", "26.3");
         payload.add("features", GSON.toJsonTree(new String[] {
             "finance_ui",
             "trade_commands",

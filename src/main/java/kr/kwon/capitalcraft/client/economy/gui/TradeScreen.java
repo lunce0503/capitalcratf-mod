@@ -3,7 +3,7 @@ package kr.kwon.capitalcraft.client.economy.gui;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import kr.kwon.capitalcraft.client.network.CapitalCraftNetwork;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -108,7 +108,7 @@ public final class TradeScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         graphics.fill(0, 0, this.width, this.height, 0x90000000);
         int panelWidth = 360;
         int left = (this.width - panelWidth) / 2;
@@ -121,17 +121,17 @@ public final class TradeScreen extends Screen {
 
         graphics.fill(left, top, right, bottom, 0xE0101216);
         graphics.fill(left, top, right, top + 1, active ? 0xFF69D38B : 0xFF76808F);
-        graphics.drawString(this.font, "CapitalCraft 거래", left + 20, top + 16, 0xFFFFFFFF, false);
-        graphics.drawString(this.font, active ? "거래 진행 중" : "대기 중", right - 82, top + 16, active ? 0xFF69D38B : 0xFFB8C0CC, false);
+        graphics.text(this.font, "CapitalCraft 거래", left + 20, top + 16, 0xFFFFFFFF, false);
+        graphics.text(this.font, active ? "거래 진행 중" : "대기 중", right - 82, top + 16, active ? 0xFF69D38B : 0xFFB8C0CC, false);
 
-        graphics.drawString(this.font, leftName, leftGridX, top + 34, 0xFFFFD36B, false);
-        graphics.drawString(this.font, rightName, rightGridX, top + 34, 0xFFFFD36B, false);
+        graphics.text(this.font, leftName, leftGridX, top + 34, 0xFFFFD36B, false);
+        graphics.text(this.font, rightName, rightGridX, top + 34, 0xFFFFD36B, false);
         drawGrid(graphics, leftGridX, gridY, leftSlots, true);
         drawGrid(graphics, rightGridX, gridY, rightSlots, false);
 
-        graphics.drawString(this.font, "내 제안", left + 20, top + 130, 0xFFB8C0CC, false);
-        graphics.drawString(this.font, "상대 수락 상태", left + 222, top + 130, 0xFFB8C0CC, false);
-        graphics.drawString(this.font, status, left + 20, bottom - 20, 0xFFB8C0CC, false);
+        graphics.text(this.font, "내 제안", left + 20, top + 130, 0xFFB8C0CC, false);
+        graphics.text(this.font, "상대 수락 상태", left + 222, top + 130, 0xFFB8C0CC, false);
+        graphics.text(this.font, status, left + 20, bottom - 20, 0xFFB8C0CC, false);
 
         if (acceptButton != null) {
             acceptButton.setMessage(Component.literal(leftAccepted ? "수락 완료" : "내 수락"));
@@ -139,7 +139,7 @@ public final class TradeScreen extends Screen {
         if (rightAcceptStatusButton != null) {
             rightAcceptStatusButton.setMessage(Component.literal(rightAccepted ? "상대 수락 완료" : "상대 대기"));
         }
-        super.render(graphics, mouseX, mouseY, partialTick);
+        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
     }
 
     public void setStatus(String status) {
@@ -213,7 +213,7 @@ public final class TradeScreen extends Screen {
         }
     }
 
-    private void drawGrid(GuiGraphics graphics, int x, int y, SlotView[] slots, boolean ownSide) {
+    private void drawGrid(GuiGraphicsExtractor graphics, int x, int y, SlotView[] slots, boolean ownSide) {
         for (int row = 0; row < 3; row++) {
             for (int column = 0; column < 3; column++) {
                 int index = row * 3 + column;
@@ -224,7 +224,7 @@ public final class TradeScreen extends Screen {
         }
     }
 
-    private void drawSlot(GuiGraphics graphics, int x, int y, SlotView slot, boolean ownSide) {
+    private void drawSlot(GuiGraphicsExtractor graphics, int x, int y, SlotView slot, boolean ownSide) {
         int border = ownSide ? 0xFF566272 : 0xFF6B5A49;
         graphics.fill(x, y, x + SLOT_SIZE, y + SLOT_SIZE, border);
         graphics.fill(x + 1, y + 1, x + SLOT_SIZE - 1, y + SLOT_SIZE - 1, 0xFF171B21);
@@ -233,8 +233,8 @@ public final class TradeScreen extends Screen {
         }
         int color = "money".equals(slot.type) ? 0xFFFFD36B : 0xFFE6E6E6;
         String label = compact(slot.label, 4);
-        graphics.drawCenteredString(this.font, label, x + SLOT_SIZE / 2, y + 5, color);
-        graphics.drawCenteredString(this.font, compact(slot.detail, 5), x + SLOT_SIZE / 2, y + 15, 0xFFB8C0CC);
+        graphics.centeredText(this.font, label, x + SLOT_SIZE / 2, y + 5, color);
+        graphics.centeredText(this.font, compact(slot.detail, 5), x + SLOT_SIZE / 2, y + 15, 0xFFB8C0CC);
     }
 
     private String compact(String value, int max) {

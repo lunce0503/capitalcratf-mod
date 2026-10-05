@@ -11,7 +11,7 @@ import kr.kwon.capitalcraft.client.resident.ResidentClientState;
 import kr.kwon.capitalcraft.client.resident.render.ResidentRendering;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -19,14 +19,14 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class CapitalCraftClientMod implements ClientModInitializer {
     public static final String MOD_ID = "capitalcraft-mod";
     public static final String RESOURCE_NAMESPACE = "capitalcraft";
-    public static final String MOD_VERSION = "0.8.1";
+    public static final String MOD_VERSION = "0.9.0";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static final KeyMapping.Category KEY_CATEGORY =
         KeyMapping.Category.register(Identifier.fromNamespaceAndPath("capitalcraft", "finance"));
@@ -35,8 +35,8 @@ public final class CapitalCraftClientMod implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        PayloadTypeRegistry.playC2S().register(FinancePayload.TYPE, FinancePayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(FinancePayload.TYPE, FinancePayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(FinancePayload.TYPE, FinancePayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(FinancePayload.TYPE, FinancePayload.CODEC);
         ClientPlayNetworking.registerGlobalReceiver(FinancePayload.TYPE, (payload, context) -> {
             context.client().execute(() -> CapitalCraftNetwork.handle(payload.json()));
         });
@@ -53,14 +53,14 @@ public final class CapitalCraftClientMod implements ClientModInitializer {
         VehicleHud.register();
         ResidentRendering.register();
 
-        financeKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        financeKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
             "key.capitalcraft.finance",
-            GLFW.GLFW_KEY_V,
+            InputConstants.KEY_V,
             KEY_CATEGORY
         ));
-        tradeKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        tradeKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
             "key.capitalcraft.trade",
-            GLFW.GLFW_KEY_G,
+            InputConstants.KEY_G,
             KEY_CATEGORY
         ));
 
@@ -80,17 +80,15 @@ public final class CapitalCraftClientMod implements ClientModInitializer {
         if (client.player == null || client.level == null) {
             return;
         }
-        if (client.screen instanceof FinanceScreen) {
+        if (client.gui.screen() instanceof FinanceScreen) {
             return;
         }
         try {
-            client.setScreen(new FinanceScreen());
+            client.setScreenAndShow(new FinanceScreen());
         } catch (RuntimeException exception) {
             LOGGER.error("Failed to open CapitalCraft finance screen", exception);
-            client.player.displayClientMessage(
-                Component.literal("CapitalCraft 금융 화면을 열 수 없습니다. 로그를 확인해 주세요."),
-                false
-            );
+            client.player.sendSystemMessage(
+                Component.literal("CapitalCraft 금융 화면을 열 수 없습니다. 로그를 확인해 주세요."));
         }
     }
 
@@ -98,17 +96,15 @@ public final class CapitalCraftClientMod implements ClientModInitializer {
         if (client.player == null || client.level == null) {
             return;
         }
-        if (client.screen instanceof TradeScreen) {
+        if (client.gui.screen() instanceof TradeScreen) {
             return;
         }
         try {
-            client.setScreen(new TradeScreen());
+            client.setScreenAndShow(new TradeScreen());
         } catch (RuntimeException exception) {
             LOGGER.error("Failed to open CapitalCraft trade screen", exception);
-            client.player.displayClientMessage(
-                Component.literal("CapitalCraft 거래 화면을 열 수 없습니다. 로그를 확인해 주세요."),
-                false
-            );
+            client.player.sendSystemMessage(
+                Component.literal("CapitalCraft 거래 화면을 열 수 없습니다. 로그를 확인해 주세요."));
         }
     }
 }

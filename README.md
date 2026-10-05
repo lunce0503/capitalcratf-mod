@@ -1,6 +1,6 @@
 # CapitalCraft Mod
 
-Fabric 1.21.11 client mod for CapitalCraft.
+Fabric 26.3 client mod for CapitalCraft.
 
 ## Features
 
@@ -64,14 +64,14 @@ Regenerate the mesh with `node tools/generate-mari-resident-model.mjs` and its a
 four-view preview with `node tools/render-mari-preview.mjs`.
 Use `generate-seia-resident-model.mjs` and `render-seia-preview.mjs` for Seia.
 
-Run the real Fabric/Mixin compatibility checks (Java 21):
+Run the real Fabric/Mixin compatibility checks (Java 25):
 
 ```bash
 ./gradlew runMariCompatibility -PmariCompatibility=sodium
 ./gradlew runMariCompatibility -PmariCompatibility=iris
 ```
 
-These use the launcher's Sodium 0.8.12 and Iris 1.10.7. A fast-path-capable vertex
+These use the launcher's Sodium 0.9.2 and Iris 1.11.7. A fast-path-capable vertex
 consumer verifies that Sodium optimizes a vanilla control cube but does not replace
 Mari's mesh faces. They exit before window creation; they do not claim a GPU
 shader-pack screenshot test. The verification mod is excluded from release JARs.

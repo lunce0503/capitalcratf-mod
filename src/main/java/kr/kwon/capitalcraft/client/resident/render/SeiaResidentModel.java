@@ -16,7 +16,7 @@ public final class SeiaResidentModel extends EntityModel<ResidentVillagerRenderS
     private final ModelPart halo;
 
     public SeiaResidentModel(ModelPart root) {
-        super(root, RenderTypes::entityCutoutNoCull);
+        super(root, RenderTypes::entityCutout);
         head = root.getChild("head");
         hair = root.getChild("hair");
         leftArm = root.getChild("left_arm");

@@ -1,7 +1,7 @@
 package kr.kwon.capitalcraft.client.economy.gui;
 
 import kr.kwon.capitalcraft.client.network.CapitalCraftNetwork;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -68,7 +68,7 @@ public final class FinanceScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         graphics.fill(0, 0, this.width, this.height, 0x90000000);
         int panelWidth = 300;
         int left = (this.width - panelWidth) / 2;
@@ -78,12 +78,12 @@ public final class FinanceScreen extends Screen {
 
         graphics.fill(left, top, right, bottom, 0xE0101216);
         graphics.fill(left, top, right, top + 1, 0xFF5EA1FF);
-        graphics.drawString(this.font, "CapitalCraft 금융", left + 20, top + 18, 0xFFFFFFFF, false);
-        graphics.drawString(this.font, accountName + " / " + accountStatus, left + 20, top + 40, 0xFFB8C0CC, false);
-        graphics.drawString(this.font, currency + " " + balance, left + 20, top + 58, 0xFFFFD36B, false);
-        graphics.drawString(this.font, status, left + 20, bottom - 24, 0xFFB8C0CC, false);
+        graphics.text(this.font, "CapitalCraft 금융", left + 20, top + 18, 0xFFFFFFFF, false);
+        graphics.text(this.font, accountName + " / " + accountStatus, left + 20, top + 40, 0xFFB8C0CC, false);
+        graphics.text(this.font, currency + " " + balance, left + 20, top + 58, 0xFFFFD36B, false);
+        graphics.text(this.font, status, left + 20, bottom - 24, 0xFFB8C0CC, false);
 
-        super.render(graphics, mouseX, mouseY, partialTick);
+        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
     }
 
     public void updateBalance(String balance, String currency, String accountName, String accountStatus) {

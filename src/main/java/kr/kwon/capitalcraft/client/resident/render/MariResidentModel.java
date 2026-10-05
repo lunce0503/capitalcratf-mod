@@ -15,7 +15,7 @@ public final class MariResidentModel extends EntityModel<ResidentVillagerRenderS
     private final ModelPart halo;
 
     public MariResidentModel(ModelPart root) {
-        super(root, RenderTypes::entityCutoutNoCull);
+        super(root, RenderTypes::entityCutout);
         head = root.getChild("head");
         veil = root.getChild("veil");
         leftArm = root.getChild("left_arm");

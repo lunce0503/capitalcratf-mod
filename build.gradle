@@ -1,5 +1,5 @@
 plugins {
-    id 'net.fabricmc.fabric-loom-remap' version '1.17.11'
+    id 'net.fabricmc.fabric-loom' version '1.17.11'
     id 'maven-publish'
 }
 
@@ -12,9 +12,8 @@ base {
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
 processResources {
@@ -26,13 +25,13 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = 'UTF-8'
-    it.options.release = 21
+    it.options.release = 25
 }
 
 java {
     withSourcesJar()
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 // Exercise the native ModelPart mesh/UV submission without requiring a GPU/window.
@@ -62,9 +61,9 @@ check.dependsOn verifyMariMesh, verifySeiaMesh
 if (providers.gradleProperty('mariCompatibility').isPresent()) {
     repositories { maven { url = 'https://api.modrinth.com/maven' } }
     dependencies {
-        modLocalRuntime 'maven.modrinth:sodium:mc1.21.11-0.8.12-fabric'
+        runtimeOnly 'maven.modrinth:sodium:mc26.3-0.9.2-fabric'
         if (providers.gradleProperty('mariCompatibility').get() == 'iris') {
-            modLocalRuntime 'maven.modrinth:iris:fDpuVzVr'
+            runtimeOnly 'maven.modrinth:iris:vTN4NRGW'
         }
     }
     loom {

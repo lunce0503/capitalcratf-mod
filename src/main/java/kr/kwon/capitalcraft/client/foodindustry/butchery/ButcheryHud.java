@@ -2,9 +2,10 @@ package kr.kwon.capitalcraft.client.foodindustry.butchery;
 
 import java.util.Comparator;
 import java.util.Locale;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 
 public final class ButcheryHud {
@@ -12,12 +13,15 @@ public final class ButcheryHud {
     }
 
     public static void register() {
-        HudRenderCallback.EVENT.register((graphics, tickCounter) -> render(graphics));
+        HudElementRegistry.addLast(
+            Identifier.fromNamespaceAndPath("capitalcraft", "butchery_hud"),
+            (graphics, tickCounter) -> render(graphics)
+        );
     }
 
-    private static void render(GuiGraphics graphics) {
+    private static void render(GuiGraphicsExtractor graphics) {
         Minecraft client = Minecraft.getInstance();
-        if (client.player == null || client.level == null || client.screen != null) {
+        if (client.player == null || client.level == null || client.gui.screen() != null) {
             return;
         }
         ButcheryCarcassState target = nearestCarcass(client);
@@ -26,8 +30,8 @@ public final class ButcheryHud {
         }
         int x = 12;
         int y = 12;
-        graphics.drawString(client.font, "CapitalCraft 도축", x, y, 0xFFE6D2, true);
-        graphics.drawString(
+        graphics.text(client.font, "CapitalCraft 도축", x, y, 0xFFE6D2, true);
+        graphics.text(
             client.font,
             String.format(Locale.US, "돼지 사체 %.1fkg", target.weight()),
             x,
@@ -35,7 +39,7 @@ public final class ButcheryHud {
             0xFFFFFF,
             true
         );
-        graphics.drawString(
+        graphics.text(
             client.font,
             "남은 부위 " + target.remainingPartCount() + " / 6",
             x,
