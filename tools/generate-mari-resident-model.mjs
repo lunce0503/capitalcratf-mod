@@ -1,9 +1,7 @@
 // One mesh source for the in-game ModelParts, editable OBJ, and software preview.
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { writePng } from './mari-png.mjs';
-import { roundedFace } from './resident-head-geometry.mjs';
+import { cuboidFace, applyReferenceHeadProportions, writeResidentAssets } from './resident-face-texture.mjs';
 
 const base = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const output = path.join(base, 'src/main/resources/assets/capitalcraft/models/entity/resident/mari');
@@ -136,33 +134,13 @@ for(const s of [-1,1]) {
 }
 box('back_bow_knot','body',[0,1.054,-.275],[.107,.107,.074],'goldLight',Math.PI/4);
 
-// Full cheeks blend into a rounded jaw, with the widest ring below the eyes.
-const facePoint=roundedFace(mesh,[[1.60,.22,.217,.025],[1.635,.282,.245,.025,.003],
-  [1.68,.331,.275,.025,.02],[1.725,.357,.282,.025,.027],[1.765,.354,.27,.025,.014],
-  [1.81,.335,.261,.02],[1.91,.326,.261,.02],[2.075,.326,.261,.02],[2.145,.272,.223,.005]]);
-const eyeStart=objects.length;
-for(const s of [-1,1]) {
-  const x=s*.143;
-  panel(`eye_white_${s}`,'head',[[x-.084,1.86,.287],[x+.084,1.86,.287],[x+.079,1.776,.287],[x-.079,1.776,.287]],'whiteLight');
-  box(`iris_${s}`,'head',[x,1.815,.3],[.077,.094,.009],'eye');
-  box(`iris_top_${s}`,'head',[x,1.845,.307],[.077,.027,.009],'eyeShade');
-  box(`iris_bottom_${s}`,'head',[x,1.78,.31],[.063,.017,.009],'eyeLight');
-  box(`pupil_${s}`,'head',[x,1.824,.313],[.023,.058,.007],'eyeShade');
-  box(`catchlight_${s}`,'head',[x-.018,1.843,.32],[.024,.024,.006],'whiteLight');
-  panel(`eyelash_${s}`,'head',[[x-.086,1.881,.308],[x+.085,1.876,.308],[x+.095,1.848,.309],[x-.086,1.854,.309]],'ink');
-  box(`eyebrow_${s}`,'head',[x,1.912,.29],[.11,.013,.011],'hairShade',s*.07);
-}
-for(const o of objects.slice(eyeStart)) o.vertices=o.vertices.map(([x,y,z])=>[x,y,+(z+.01).toFixed(5)]);
-for(const s of [-1,1]) panel(`blush_${s}`,'head',[
-  facePoint(s*.226-.026,1.735,.01),facePoint(s*.226+.026,1.735,.01),
-  facePoint(s*.226+.026,1.72,.01),facePoint(s*.226-.026,1.72,.01)],'blush',.004);
-panel('small_mouth','head',[facePoint(-.0215,1.676),facePoint(.0215,1.676),
-  facePoint(.0215,1.668),facePoint(-.0215,1.668)],'mouth',.004);
-jewel('nose','head',facePoint(0,1.749,.008),.012,'skinShade');
+// One plain rectangular head: all facial features are painted in its atlas.
+cuboidFace(mesh,objects,'mari');
 
 // Hair cap, individual pointed fringe locks, side tresses and a woven braid.
 rings('hair_cap','head',[[0,1.74,-.05,.336,.27],[0,2.10,-.03,.365,.305],[0,2.22,-.04,.29,.25]],'hair',12);
 for(const [i,x] of [-.244,-.124,0,.124,.244].entries()) {
+  // Exact fringe-tip heights imported from the supplied Blender model.
   const center=i===2, bottom=center?1.863:1.913+(i===0||i===4?.02:0);
   lock(`fringe_${i}`,[[x,2.17,.276,.077,.045],[x*1.04,2.064,.313,.085,.055],[x*.96,1.985,.328,.067,.05],[x*.91,bottom,.304,.009,.019]]);
 }
@@ -234,27 +212,5 @@ mesh('halo_center_gem','halo',[[0,hy,.081],[-.081,hy,0],[0,hy,-.081],[.081,hy,0]
 // A slight tilt keeps the star motif readable from the ordinary player viewpoint.
 for(const o of objects.filter(o=>o.bone==='halo')) o.vertices=o.vertices.map(([x,y,z])=>[x,+(hy+(y-hy)*Math.cos(.40)+z*Math.sin(.40)).toFixed(5),+(-(y-hy)*Math.sin(.40)+z*Math.cos(.40)).toFixed(5)]);
 
-fs.mkdirSync(output,{recursive:true});
-const data={format:2,texture:'capitalcraft:textures/entity/resident/mari.png',unitsPerBlock:16,modelScale:12,bones,palette,objects};
-fs.writeFileSync(path.join(output,'mari-mesh.json'),JSON.stringify(data)+'\n');
-const obj=['# Same geometry as mari-mesh.json; Y up, +Z front; 0.75 blocks per unit.','mtllib mari-resident.mtl'];
-let index=1;
-for(const o of objects) {
-  obj.push(`o ${o.name}`);
-  for(const p of o.vertices)obj.push(`v ${p.map(v=>(v*.75).toFixed(6)).join(' ')}`);
-  for(const f of o.faces) {obj.push(`usemtl ${f.material}`);obj.push(`f ${f.indices.map(i=>index+i).join(' ')}`);}
-  index+=o.vertices.length;
-}
-fs.writeFileSync(path.join(output,'mari-resident.obj'),obj.join('\n')+'\n');
-const rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
-fs.writeFileSync(path.join(output,'mari-resident.mtl'),Object.entries(palette).map(([k,c])=>`newmtl ${k}\nKd ${rgb(c).map(v=>(v/255).toFixed(6)).join(' ')}\nd 1\nillum 1`).join('\n\n')+'\n');
-const pixels=Buffer.alloc(64*64*4), colors=Object.values(palette).map(rgb);
-for(let y=0;y<64;y++)for(let x=0;x<64;x++) {
-  const color=colors[Math.floor(y/8)*8+Math.floor(x/8)]??colors[0],p=(y*64+x)*4;
-  pixels.set([...color,255],p);
-}
-writePng(path.join(base,'src/main/resources/assets/capitalcraft/textures/entity/resident/mari.png'),64,64,pixels);
-const ys=objects.flatMap(o=>o.vertices.map(p=>p[1]));
-const summary={format:'shared-mesh-v2',objectCount:objects.length,vertexCount:index-1,faceCount:objects.reduce((n,o)=>n+o.faces.length,0),heightBlocks:+((Math.max(...ys)-Math.min(...ys))*.75).toFixed(4),foxEarParts:['left_fox_ear','right_fox_ear','left_fox_ear_inner','right_fox_ear_inner'],runtimeMesh:'mari-mesh.json',preview:'mari-preview.png'};
-fs.writeFileSync(path.join(output,'mari-resident-model.json'),JSON.stringify(summary,null,2)+'\n');
-console.log(summary);
+applyReferenceHeadProportions(objects,bones);
+writeResidentAssets(base,output,'mari',bones,palette,objects);

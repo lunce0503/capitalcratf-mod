@@ -11,6 +11,7 @@ import net.minecraft.client.model.geom.ModelPart;
 /** Objective checks: one undecorated cuboid with painted, correctly mapped features. */
 final class ResidentFaceVerification {
     static void check(JsonObject data, BufferedImage texture, ModelPart root) {
+        boolean seia=data.get("texture").getAsString().contains("seia");
         JsonObject head = null;
         int heads = 0;
         for (var value : data.getAsJsonArray("objects")) {
@@ -36,11 +37,14 @@ final class ResidentFaceVerification {
             low[axis]=Math.min(low[axis],value); high[axis]=Math.max(high[axis],value);
         }
         float width=high[0]-low[0],height=high[1]-low[1],depth=high[2]-low[2];
-        require(Math.abs(width-.7198F)<1e-4F, "Near-cube head width");
-        require(Math.abs(height-.6572F)<1e-4F, "Near-cube head height");
-        require(Math.abs(depth-.638F)<1e-4F, "Near-cube head depth");
-        require(Math.max(width,Math.max(height,depth))/Math.min(width,Math.min(height,depth))<1.14F,
-            "Head dimensions must remain cube-like");
+        float expectedWidth=seia?.7198F:.7552F;
+        float expectedHeight=seia?.6572F:.5724F;
+        float expectedDepth=seia?.638F:.5357F;
+        require(Math.abs(width-expectedWidth)<1e-4F, "Imported head width");
+        require(Math.abs(height-expectedHeight)<1e-4F, "Imported head height");
+        require(Math.abs(depth-expectedDepth)<1e-4F, "Imported head depth");
+        if(seia) require(Math.max(width,Math.max(height,depth))/Math.min(width,Math.min(height,depth))<1.14F,
+            "Seia head dimensions must remain cube-like");
         int textured=0;
         JsonObject painted=null;
         for(var value:head.getAsJsonArray("faces")) {
@@ -88,7 +92,6 @@ final class ResidentFaceVerification {
                 "No nose or mouth pixels: the entire lower face must be plain skin");
         }
         // Reference eyes: rectangular pupils without sparkle dots and pointed, thick lids.
-        boolean seia=data.get("texture").getAsString().contains("seia");
         for(int cx:new int[]{36,92}) {
             int minX=128,maxX=-1,coloured=0,eyeMin=128,eyeMax=-1;
             int upper=seia?72:70, lower=seia?88:89;

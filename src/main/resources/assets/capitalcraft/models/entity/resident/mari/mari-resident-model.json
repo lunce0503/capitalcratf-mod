@@ -17,11 +17,11 @@
       1.1
     ],
     "anchorY": 1.61,
-    "shape": "near-cube",
+    "shape": "attached-blender-cuboid",
     "dimensions": [
-      0.7198,
-      0.6572,
-      0.638
+      0.7552,
+      0.5724,
+      0.5357
     ],
     "eyeStyle": "wide-angular-block",
     "eyeWidthFraction": 0.3125,
