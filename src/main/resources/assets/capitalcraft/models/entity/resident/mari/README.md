@@ -37,22 +37,25 @@ Minecraft에서 읽히는 면 분할 메시로 재구성했다. 게임, OBJ, 프
 `ModelPart`로 변환하고 `textures/entity/resident/mari.png` 팔레트를 적용한다.
 머리, 베일, 양팔, 양다리, 헤일로는 독립 본으로 움직인다.
 
-얼굴은 `flat_face` 하나로 구성된 8정점·6면의 직육면체다. 볼, 코, 입,
-눈의 돌출 메시나 베벨은 없다. 앞면에만 정규화된 `uv`를 지정해 눈·눈썹을
-텍스처로 표현하고, 나머지 면은 기존 피부색 팔레트를 사용한다.
+얼굴은 첨부 Blender 파일의 미러 모디파이어를 적용한 `flat_face` 하나로,
+12정점·10면의 직육면체다. 앞면 두 면이 같은 눈 그림을 좌우로 미러 매핑한다.
+볼, 코, 입, 눈의 돌출 메시나 베벨은 없다. 나머지 면은 피부색 팔레트를 사용한다.
 코·입은 텍스처에서도 생략하며 눈 아래는 단색 피부다.
 공유 생성기는 `tools/resident-face-texture.mjs`다.
 참고 사진의 비율에 맞춰 머리·머리카락·귀·베일·헤일로에 동일한 변환을
 적용한다(폭 1.18배, 높이 1.06배, 깊이 1.10배; 기준 Y 1.61).
-눈동자는 단순한 세로 사각형, 윗눈꺼풀은 두껍고 뾰족한 다각형으로 표현한다.
-둥근 홍채·반짝임·아랫눈꺼풀 선은 없다.
+첨부 파일의 내장 텍스처를 그대로 사용해 큰 청록색 눈동자와 두꺼운 속눈썹,
+작은 흰 하이라이트를 표현한다.
 
-최신 블렌더 작업 파일과 정면·대각선·전신 사진은 프로젝트의
-`client/models/resident-faces/block-eyes/`에
-보관한다. `blender -b --python tools/blender-resident-faces.py -- --output-dir build/blender-faces`로
-다시 생성할 수 있다. 블렌더 파일에는 텍스처가 내장되어 있다.
-블렌더 편집 내용이 게임으로 자동 반영되지는 않으므로 생성 스크립트와 런타임 메시에도
-동일한 변경을 반영해야 한다.
+최신 사용자 첨부 파일에서 `tools/import-mari-blend.py`로 평가된 메시와 UV,
+내장 텍스처를 추출한다. 입력은 `tools/mari-blender-geometry-overrides.json`,
+`tools/mari-blender-atlas.png`, `tools/mari-blender-face.png`에 저장한다.
+JSON에는 원본 Blender 파일의 SHA256도 기록한다. 얼굴·상의·목·여우귀 안쪽
+7개 오브젝트를 재생성 때 적용하며, 세이아는 변경하지 않는다.
+
+```bash
+blender -b mari-seia-textured-faces.blend --python tools/import-mari-blend.py
+```
 
 ## 재생성 및 검증
 

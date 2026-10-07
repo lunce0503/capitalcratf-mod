@@ -11,7 +11,8 @@ export const referenceHeadProportions={
 };
 export function residentHeadProportions(name) {
   if(name!=='mari')return referenceHeadProportions;
-  return {...referenceHeadProportions,shape:'attached-blender-cuboid',dimensions:[.7552,.5724,.5357]};
+  return {...referenceHeadProportions,shape:'attached-blender-mirrored-cuboid',dimensions:[.54972,.43554,.5357],
+    eyeStyle:'attached-mirrored-block-eye',eyeWidthFraction:.21875,lashSafeMarginPixels:5};
 }
 const rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
 

@@ -1,5 +1,6 @@
 // One mesh source for the in-game ModelParts, editable OBJ, and software preview.
 import path from 'node:path';
+import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { cuboidFace, applyReferenceHeadProportions, writeResidentAssets } from './resident-face-texture.mjs';
 
@@ -213,4 +214,18 @@ mesh('halo_center_gem','halo',[[0,hy,.081],[-.081,hy,0],[0,hy,-.081],[.081,hy,0]
 for(const o of objects.filter(o=>o.bone==='halo')) o.vertices=o.vertices.map(([x,y,z])=>[x,+(hy+(y-hy)*Math.cos(.40)+z*Math.sin(.40)).toFixed(5),+(-(y-hy)*Math.sin(.40)+z*Math.cos(.40)).toFixed(5)]);
 
 applyReferenceHeadProportions(objects,bones);
+// Geometry edited in the supplied Blender file is authoritative. Keeping the
+// evaluated mesh as data makes the in-game result reproducible without Blender.
+const overrides=JSON.parse(fs.readFileSync(path.join(base,'tools/mari-blender-geometry-overrides.json'),'utf8'));
+for(const [name,geometry] of Object.entries(overrides.objects)) {
+  const object=objects.find(candidate=>candidate.name===name);
+  if(!object)throw new Error(`Blender override references missing Mari object: ${name}`);
+  object.vertices=geometry.vertices;
+  object.faces=geometry.faces;
+}
 writeResidentAssets(base,output,'mari',bones,palette,objects);
+// Use the supplied packed artwork, including the single eye mirrored by UVs.
+fs.copyFileSync(path.join(base,'tools/mari-blender-atlas.png'),path.join(output,'mari-atlas.png'));
+fs.copyFileSync(path.join(base,'tools/mari-blender-atlas.png'),
+  path.join(base,'src/main/resources/assets/capitalcraft/textures/entity/resident/mari.png'));
+fs.copyFileSync(path.join(base,'tools/mari-blender-face.png'),path.join(output,'mari-face.png'));

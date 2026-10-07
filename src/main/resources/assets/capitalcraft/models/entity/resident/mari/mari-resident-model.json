@@ -1,8 +1,8 @@
 {
   "format": "shared-mesh-v2",
   "objectCount": 211,
-  "vertexCount": 2621,
-  "faceCount": 2710,
+  "vertexCount": 2625,
+  "faceCount": 2712,
   "heightBlocks": 2.2102,
   "faceStyle": "textured-cuboid",
   "facialFeatures": "eyes-only",
@@ -17,15 +17,15 @@
       1.1
     ],
     "anchorY": 1.61,
-    "shape": "attached-blender-cuboid",
+    "shape": "attached-blender-mirrored-cuboid",
     "dimensions": [
-      0.7552,
-      0.5724,
+      0.54972,
+      0.43554,
       0.5357
     ],
-    "eyeStyle": "wide-angular-block",
-    "eyeWidthFraction": 0.3125,
-    "lashSafeMarginPixels": 12
+    "eyeStyle": "attached-mirrored-block-eye",
+    "eyeWidthFraction": 0.21875,
+    "lashSafeMarginPixels": 5
   },
   "foxEarParts": [
     "left_fox_ear",
