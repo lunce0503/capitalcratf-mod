@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.VillagerRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.network.chat.Component;
 
 public final class ResidentAwareVillagerRenderer
     extends EntityRenderer<Villager, ResidentVillagerRenderState> {
@@ -31,6 +32,8 @@ public final class ResidentAwareVillagerRenderer
     public void extractRenderState(Villager villager, ResidentVillagerRenderState state, float partialTick) {
         vanillaRenderer.extractRenderState(villager, state, partialTick);
         state.appearance = ResidentClientState.appearance(villager.getUUID());
+        String residentName = ResidentClientState.name(villager.getUUID());
+        if (residentName != null && state.nameTag != null) state.nameTag = Component.literal(residentName);
     }
 
     @Override

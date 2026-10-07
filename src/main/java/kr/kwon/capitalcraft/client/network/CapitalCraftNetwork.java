@@ -12,6 +12,7 @@ import kr.kwon.capitalcraft.client.foodindustry.butchery.ButcheryClientState;
 import kr.kwon.capitalcraft.client.resident.ResidentClientState;
 import kr.kwon.capitalcraft.client.economy.gui.FinanceScreen;
 import kr.kwon.capitalcraft.client.economy.gui.TradeScreen;
+import kr.kwon.capitalcraft.client.economy.BankClientState;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 
@@ -41,6 +42,7 @@ public final class CapitalCraftNetwork {
         VehicleClientState.reset();
         VehicleInputController.reset();
         ResidentClientState.reset();
+        BankClientState.reset();
     }
 
     public static void queueHello() {
@@ -100,7 +102,10 @@ public final class CapitalCraftNetwork {
             "butchery_sync",
             "butchery_hud",
             "vehicle_v1",
-            "resident_appearance_v1"
+            "resident_appearance_v1",
+            "resident_speech_v1",
+            "resident_speech_v2",
+            "bank_hud_v1"
         }));
         return send("C2S_HELLO", "hello-" + UUID.randomUUID(), payload);
     }
@@ -212,6 +217,7 @@ public final class CapitalCraftNetwork {
                 updateScreenStatus(handshakeAccepted ? "서버 연결 완료" : "서버 연결 거부");
             }
             case "S2C_BALANCE_RESPONSE" -> {
+                BankClientState.sync(payload);
                 if (openFinanceScreen != null) {
                     openFinanceScreen.updateBalance(
                         string(payload, "balance", "0"),
@@ -225,6 +231,10 @@ public final class CapitalCraftNetwork {
                 boolean success = bool(payload, "success", false);
                 if (success) {
                     String balance = string(payload, "fromBalance", "0");
+                    JsonObject bank = new JsonObject();
+                    bank.addProperty("balance", balance);
+                    bank.addProperty("currency", "VIL");
+                    BankClientState.sync(bank);
                     if (openFinanceScreen != null) {
                         openFinanceScreen.updateTransferResult("송금 완료", balance);
                     }
@@ -242,6 +252,7 @@ public final class CapitalCraftNetwork {
                 }
             }
             case "S2C_BALANCE_UPDATED" -> {
+                BankClientState.sync(payload);
                 if (openFinanceScreen != null) {
                     openFinanceScreen.updateBalance(
                         string(payload, "balance", "0"),

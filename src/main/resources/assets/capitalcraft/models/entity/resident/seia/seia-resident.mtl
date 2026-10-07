@@ -162,3 +162,9 @@ newmtl beak
 Kd 0.843137 0.635294 0.352941
 d 1
 illum 1
+
+newmtl face_texture
+Kd 1 1 1
+d 1
+illum 1
+map_Kd seia-atlas.png

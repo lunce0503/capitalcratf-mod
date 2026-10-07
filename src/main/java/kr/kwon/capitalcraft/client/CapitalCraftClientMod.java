@@ -8,7 +8,10 @@ import kr.kwon.capitalcraft.client.economy.gui.TradeScreen;
 import kr.kwon.capitalcraft.client.network.CapitalCraftNetwork;
 import kr.kwon.capitalcraft.client.network.FinancePayload;
 import kr.kwon.capitalcraft.client.resident.ResidentClientState;
+import kr.kwon.capitalcraft.client.resident.ResidentSpeechHud;
 import kr.kwon.capitalcraft.client.resident.render.ResidentRendering;
+import kr.kwon.capitalcraft.client.economy.BankHud;
+import kr.kwon.capitalcraft.client.hud.HudEditorScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
@@ -26,12 +29,15 @@ import org.slf4j.LoggerFactory;
 public final class CapitalCraftClientMod implements ClientModInitializer {
     public static final String MOD_ID = "capitalcraft-mod";
     public static final String RESOURCE_NAMESPACE = "capitalcraft";
-    public static final String MOD_VERSION = "0.9.0";
+    public static final String MOD_VERSION = "0.9.3";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static final KeyMapping.Category KEY_CATEGORY =
         KeyMapping.Category.register(Identifier.fromNamespaceAndPath("capitalcraft", "finance"));
     private static KeyMapping financeKey;
     private static KeyMapping tradeKey;
+    private static KeyMapping bankHudKey;
+    private static KeyMapping hudEditorKey;
+    private static boolean editChordHeld;
 
     @Override
     public void onInitializeClient() {
@@ -51,7 +57,9 @@ public final class CapitalCraftClientMod implements ClientModInitializer {
         });
         ButcheryHud.register();
         VehicleHud.register();
+        BankHud.register();
         ResidentRendering.register();
+        ResidentSpeechHud.register();
 
         financeKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
             "key.capitalcraft.finance",
@@ -63,6 +71,28 @@ public final class CapitalCraftClientMod implements ClientModInitializer {
             InputConstants.KEY_G,
             KEY_CATEGORY
         ));
+        bankHudKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+            "key.capitalcraft.bank_hud", InputConstants.KEY_H, KEY_CATEGORY));
+        hudEditorKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+            "key.capitalcraft.hud_editor", InputConstants.KEY_F8, KEY_CATEGORY));
+
+        ClientTickEvents.START_CLIENT_TICK.register(client -> {
+            boolean editChord = InputConstants.isKeyDown(InputConstants.KEY_SPACE)
+                && (InputConstants.isKeyDown(InputConstants.KEY_LALT) || InputConstants.isKeyDown(InputConstants.KEY_RALT));
+            if (editChord && !editChordHeld && client.player != null && client.level != null && client.gui.screen() == null) {
+                client.options.keyJump.setDown(false);
+                client.setScreenAndShow(new HudEditorScreen());
+            }
+            editChordHeld = editChord;
+            while (bankHudKey.consumeClick()) {
+                if (client.player != null && client.gui.screen() == null) BankHud.toggle();
+            }
+            while (hudEditorKey.consumeClick()) {
+                if (client.player != null && client.level != null && client.gui.screen() == null) {
+                    client.setScreenAndShow(new HudEditorScreen());
+                }
+            }
+        });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             CapitalCraftNetwork.tick();

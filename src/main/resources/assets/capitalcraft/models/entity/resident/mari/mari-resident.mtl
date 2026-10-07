@@ -167,3 +167,9 @@ newmtl sole
 Kd 0.674510 0.580392 0.356863
 d 1
 illum 1
+
+newmtl face_texture
+Kd 1 1 1
+d 1
+illum 1
+map_Kd mari-atlas.png

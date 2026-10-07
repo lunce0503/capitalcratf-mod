@@ -56,6 +56,22 @@ tasks.named('test') {
 
 check.dependsOn verifyMariMesh, verifySeiaMesh
 
+tasks.register('verifyClientHud', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'kr.kwon.capitalcraft.client.hud.ClientHudVerification'
+    jvmArgs '-Djava.awt.headless=true'
+}
+check.dependsOn verifyClientHud
+
+tasks.register('verifyResidentSpeech', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'kr.kwon.capitalcraft.client.resident.ResidentSpeechVerification'
+    jvmArgs '-Djava.awt.headless=true'
+}
+check.dependsOn verifyResidentSpeech
+
 // Opt-in compatibility runs use the exact launcher artifacts, remapped by Loom.
 // Sodium/Iris and the test entrypoint are not bundled in the production JAR.
 if (providers.gradleProperty('mariCompatibility').isPresent()) {

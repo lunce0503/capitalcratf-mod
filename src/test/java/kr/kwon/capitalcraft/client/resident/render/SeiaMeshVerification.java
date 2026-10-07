@@ -28,7 +28,9 @@ public final class SeiaMeshVerification {
         require(data.get("texture").getAsString().equals(SeiaMeshLoader.TEXTURE.toString()), "Texture ID mismatch");
         String texturePath = "/assets/" + SeiaMeshLoader.TEXTURE.getNamespace() + "/" + SeiaMeshLoader.TEXTURE.getPath();
         BufferedImage texture = ImageIO.read(Objects.requireNonNull(SeiaMeshVerification.class.getResourceAsStream(texturePath)));
-        require(texture.getWidth() == 64 && texture.getHeight() == 64, "Palette dimensions");
+        ResidentMeshUVs textureUVs = new ResidentMeshUVs(data);
+        require(texture.getWidth() == textureUVs.width && texture.getHeight() == textureUVs.height, "Atlas dimensions");
+        ResidentFaceVerification.check(data, texture, root);
 
         int faces = 0;
         boolean leftEar = false, rightEar = false, tail = false, bird = false, halo = false;

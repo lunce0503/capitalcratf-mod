@@ -1,9 +1,32 @@
 {
   "format": "shared-mesh-v2",
-  "objectCount": 166,
-  "vertexCount": 2509,
-  "faceCount": 2827,
-  "heightBlocks": 2.1481,
+  "objectCount": 151,
+  "vertexCount": 2260,
+  "faceCount": 2459,
+  "heightBlocks": 2.2056,
+  "faceStyle": "textured-cuboid",
+  "facialFeatures": "eyes-only",
+  "textureSize": [
+    256,
+    256
+  ],
+  "headProportions": {
+    "scale": [
+      1.18,
+      1.06,
+      1.1
+    ],
+    "anchorY": 1.61,
+    "shape": "near-cube",
+    "dimensions": [
+      0.7198,
+      0.6572,
+      0.638
+    ],
+    "eyeStyle": "wide-angular-block",
+    "eyeWidthFraction": 0.3125,
+    "lashSafeMarginPixels": 12
+  },
   "foxEarParts": [
     "left_fox_ear",
     "right_fox_ear",

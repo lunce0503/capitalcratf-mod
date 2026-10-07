@@ -46,6 +46,7 @@ public final class SeiaMeshLoader {
             throw new IllegalArgumentException("Seia mesh texture identifier mismatch");
         }
         float scale = mesh.get("modelScale").getAsFloat();
+        ResidentMeshUVs textureUVs = new ResidentMeshUVs(mesh);
         List<String> materials = new ArrayList<>(mesh.getAsJsonObject("palette").keySet());
         Map<String, Vector3f> pivots = new LinkedHashMap<>();
         Map<String, List<ModelPart.Cube>> geometry = new LinkedHashMap<>();
@@ -66,8 +67,6 @@ public final class SeiaMeshLoader {
                 if (count != 3 && count != 4) throw new IllegalArgumentException("Expected triangle/quad");
                 int material = materials.indexOf(face.get("material").getAsString());
                 if (material < 0 || material >= 64) throw new IllegalArgumentException("Invalid material");
-                float u = ((material % 8) * 8 + 4) / 64.0F;
-                float v = ((material / 8) * 8 + 4) / 64.0F;
                 ModelPart.Vertex[] polygon = new ModelPart.Vertex[4];
                 Vector3f[] positions = new Vector3f[4];
                 for (int i = 0; i < 4; i++) {
@@ -76,9 +75,8 @@ public final class SeiaMeshLoader {
                     p.mul(scale, -scale, -scale);
                     positions[i] = p;
                     int corner = Math.min(i, count - 1);
-                    float du = (corner == 0 || corner == 3 ? -1 : 1) / 64.0F;
-                    float dv = (corner < 2 ? -1 : 1) / 64.0F;
-                    polygon[i] = new ModelPart.Vertex(p.x, p.y, p.z, u + du, v + dv);
+                    float[] uv = textureUVs.at(face, corner, material);
+                    polygon[i] = new ModelPart.Vertex(p.x, p.y, p.z, uv[0], uv[1]);
                 }
                 Vector3f normal = new Vector3f(positions[1]).sub(positions[0])
                     .cross(new Vector3f(positions[2]).sub(positions[0]));

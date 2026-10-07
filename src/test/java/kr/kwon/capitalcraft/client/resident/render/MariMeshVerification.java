@@ -39,9 +39,11 @@ public final class MariMeshVerification {
         require(data.get("texture").getAsString().equals(MariMeshLoader.TEXTURE.toString()), "Texture ID mismatch");
         String texturePath = "/assets/" + MariMeshLoader.TEXTURE.getNamespace() + "/" + MariMeshLoader.TEXTURE.getPath();
         BufferedImage texture = ImageIO.read(Objects.requireNonNull(MariMeshVerification.class.getResourceAsStream(texturePath)));
-        require(texture.getWidth() == 64 && texture.getHeight() == 64, "Palette dimensions");
+        ResidentMeshUVs textureUVs = new ResidentMeshUVs(data);
+        require(texture.getWidth() == textureUVs.width && texture.getHeight() == textureUVs.height, "Atlas dimensions");
+        ResidentFaceVerification.check(data, texture, root);
         List<String> palette = new ArrayList<>(data.getAsJsonObject("palette").keySet());
-        Map<Integer, List<double[]>> expected = new HashMap<>();
+        Map<String, List<double[]>> expected = new HashMap<>();
         int faces = 0;
         for (var value : data.getAsJsonArray("objects")) {
             var object = value.getAsJsonObject();
@@ -53,7 +55,8 @@ public final class MariMeshVerification {
                 for (int i = 0; i < 4; i++) {
                     var p = object.getAsJsonArray("vertices").get(indices.get(Math.min(i, indices.size() - 1)).getAsInt()).getAsJsonArray();
                     double scale = data.get("modelScale").getAsDouble() / 16;
-                    expected.computeIfAbsent(material, key -> new ArrayList<>()).add(new double[]{
+                    float[] uv = textureUVs.at(face, Math.min(i, indices.size()-1), material);
+                    expected.computeIfAbsent(uvKey(uv[0], uv[1]), key -> new ArrayList<>()).add(new double[]{
                         p.get(0).getAsDouble()*scale,1.5-p.get(1).getAsDouble()*scale,-p.get(2).getAsDouble()*scale});
                 }
             }
@@ -79,14 +82,18 @@ public final class MariMeshVerification {
                         "Preserve vertex colour, overlay and light");
                     require(Float.isFinite(x) && Float.isFinite(y) && Float.isFinite(z), "Finite position");
                     require(u > 0 && u < 1 && v > 0 && v < 1, "UV in texture");
-                    int material = (int)(v*8)*8 + (int)(u*8);
-                    require(material < palette.size(), "UV references populated tile");
-                    int rgb = texture.getRGB((int)(u*64),(int)(v*64)) & 0xffffff;
-                    require(rgb == Integer.parseInt(data.getAsJsonObject("palette").get(palette.get(material)).getAsString().substring(1),16), "Palette matches material");
+                    int px=(int)(u*texture.getWidth()), py=(int)(v*texture.getHeight());
+                    if (px<64 && py<64) {
+                        int material=(py/8)*8+px/8;
+                        require(material < palette.size(), "UV references populated tile");
+                        int rgb=texture.getRGB(px,py)&0xffffff;
+                        require(rgb == Integer.parseInt(data.getAsJsonObject("palette").get(palette.get(material)).getAsString().substring(1),16), "Palette matches material");
+                    }
                     float nx=(float)values[8],ny=(float)values[9],nz=(float)values[10];
                     require(Math.abs(nx*nx+ny*ny+nz*nz-1)<.0001, "Unit normal");
                     if (compareMesh[0]) {
-                        List<double[]> candidates = expected.get(material);
+                        List<double[]> candidates = expected.get(uvKey(u,v));
+                        require(candidates!=null, "Native UV absent from mesh");
                         int match = -1;
                         for(int i=0;i<candidates.size();i++) {
                             double[] p=candidates.get(i);
@@ -134,5 +141,9 @@ public final class MariMeshVerification {
 
     private static void require(boolean result,String reason) {
         if(!result) throw new AssertionError(reason);
+    }
+
+    private static String uvKey(float u,float v) {
+        return Math.round(u*65536)+","+Math.round(v*65536);
     }
 }
