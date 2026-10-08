@@ -8,6 +8,7 @@ import kr.kwon.capitalcraft.client.economy.gui.TradeScreen;
 import kr.kwon.capitalcraft.client.network.CapitalCraftNetwork;
 import kr.kwon.capitalcraft.client.network.FinancePayload;
 import kr.kwon.capitalcraft.client.resident.ResidentClientState;
+import kr.kwon.capitalcraft.client.resident.ResidentDialogueController;
 import kr.kwon.capitalcraft.client.resident.ResidentSpeechHud;
 import kr.kwon.capitalcraft.client.resident.render.ResidentRendering;
 import kr.kwon.capitalcraft.client.economy.BankHud;
@@ -29,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public final class CapitalCraftClientMod implements ClientModInitializer {
     public static final String MOD_ID = "capitalcraft-mod";
     public static final String RESOURCE_NAMESPACE = "capitalcraft";
-    public static final String MOD_VERSION = "0.9.3";
+    public static final String MOD_VERSION = "0.9.7";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static final KeyMapping.Category KEY_CATEGORY =
         KeyMapping.Category.register(Identifier.fromNamespaceAndPath("capitalcraft", "finance"));
@@ -60,6 +61,7 @@ public final class CapitalCraftClientMod implements ClientModInitializer {
         BankHud.register();
         ResidentRendering.register();
         ResidentSpeechHud.register();
+        ResidentDialogueController.register();
 
         financeKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
             "key.capitalcraft.finance",

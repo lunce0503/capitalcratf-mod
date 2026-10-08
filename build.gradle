@@ -72,6 +72,14 @@ tasks.register('verifyResidentSpeech', JavaExec) {
 }
 check.dependsOn verifyResidentSpeech
 
+tasks.register('verifyResidentDialogue', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'kr.kwon.capitalcraft.client.resident.ResidentDialogueVerification'
+    jvmArgs '-Djava.awt.headless=true'
+}
+check.dependsOn verifyResidentDialogue
+
 // Opt-in compatibility runs use the exact launcher artifacts, remapped by Loom.
 // Sodium/Iris and the test entrypoint are not bundled in the production JAR.
 if (providers.gradleProperty('mariCompatibility').isPresent()) {

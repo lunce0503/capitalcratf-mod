@@ -10,6 +10,7 @@ public final class ResidentClientState {
     private static final Map<UUID, String> APPEARANCES = new HashMap<>();
     private static final Map<UUID, Speech> SPEECHES = new HashMap<>();
     private static final Map<UUID, String> NAMES = new HashMap<>();
+    private static final Map<UUID, String> IDS = new HashMap<>();
     public record Speech(String text, long started, long expires) {}
 
     private ResidentClientState() {
@@ -19,6 +20,7 @@ public final class ResidentClientState {
         Map<UUID, String> next = new HashMap<>();
         Map<UUID, Speech> speech = new HashMap<>();
         Map<UUID, String> names = new HashMap<>();
+        Map<UUID, String> ids = new HashMap<>();
         if (payload.has("residents") && payload.get("residents").isJsonArray()) {
             for (JsonElement element : payload.getAsJsonArray("residents")) {
                 if (!element.isJsonObject()) {
@@ -28,6 +30,11 @@ public final class ResidentClientState {
                 try {
                     UUID entityUuid = UUID.fromString(resident.get("entityUuid").getAsString());
                     String appearance = resident.get("appearance").getAsString();
+                    if (resident.has("residentId") && resident.get("residentId").isJsonPrimitive()
+                            && resident.getAsJsonPrimitive("residentId").isString()) {
+                        String id = resident.get("residentId").getAsString();
+                        if (ResidentDialogueInput.validResidentId(id)) ids.put(entityUuid, id);
+                    }
                     if (resident.has("name") && resident.get("name").isJsonPrimitive()) {
                         String name = resident.get("name").getAsString();
                         if (!name.isBlank() && name.codePointCount(0, name.length()) <= 64) names.put(entityUuid, name);
@@ -58,6 +65,8 @@ public final class ResidentClientState {
         SPEECHES.putAll(speech);
         NAMES.clear();
         NAMES.putAll(names);
+        IDS.clear();
+        IDS.putAll(ids);
     }
 
     public static String appearance(UUID entityUuid) {
@@ -68,6 +77,11 @@ public final class ResidentClientState {
         APPEARANCES.clear();
         SPEECHES.clear();
         NAMES.clear();
+        IDS.clear();
+    }
+
+    public static String residentId(UUID entityUuid) {
+        return IDS.get(entityUuid);
     }
 
     public static String name(UUID entityUuid) {
