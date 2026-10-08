@@ -37,6 +37,16 @@ preview are all generated from one source.
 
 The server remains authoritative. This mod provides UI, input transport and rendering.
 
+Version 0.9.6 is the client compatibility release paired with CapitalCraft Paper
+plugin 0.6.5's API-free resident routines. The repeating work/rest/patrol loop runs
+on the server, not in the renderer. It continues in loaded chunks without a
+visible player and never switches to automatic Gemini calls when players appear.
+Explicit conversations and administrator requests still use the server's Gemini
+configuration. Enable residents with `/resident loop <id> on`, inspect with
+`/resident info <id>`, and stop with `/resident loop <id> off`.
+This client release preserves 0.9.5's Mari/Seia models, textures and client classes.
+It does not include the separate work-in-progress resident dialogue UI.
+
 Version 0.8.1 rounds Mari's and Seia's cheeks and jawlines, fills the temple gaps
 between fringe and side hair, and embeds Seia's fox ears in the crown with fur
 at the roots. Seia's hair follows the same head rotation so the ear/hair seams
@@ -52,7 +62,7 @@ a small area within each solid colour tile for shader tangent calculations.
 ## Build
 
 ```bash
-env JAVA_HOME=/path/to/jdk-21 ./gradlew clean build
+env JAVA_HOME=/path/to/jdk-25 ./gradlew clean build
 ```
 
 The release jar is generated under `build/libs/`.
